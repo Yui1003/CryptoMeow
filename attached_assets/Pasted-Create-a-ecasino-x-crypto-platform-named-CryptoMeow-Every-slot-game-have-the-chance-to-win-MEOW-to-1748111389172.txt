@@ -1,0 +1,57 @@
+Create a ecasino x crypto platform named CryptoMeow. Every slot game have the chance to win $MEOW token with 0-10% chance of winning. Use a theme of black-pink.
+
+Include 5 slot games with each game unique from the other.
+🕹️ 5 Games:
+1. Mines – a grid-based game like crypto Mines where users avoid hidden mines and can cash out.
+2. Crash – a multiplier rises until it randomly crashes; players try to cash out before the crash.
+3. Wheel of Fortune - multiplier rewards
+4. Hi-Lo – a card game where the player guesses if the next card is higher or lower.
+5. Dice Roll – roll a number from 1–100 with user-selectable risk ranges.
+
+
+Use this fixed bets =
+0.25, 0.50, 1.00, 1.50, 2.00, 5.00, 10.00, 50.00, 100.00, 500.00, 1000.00
+
+
+💡 Features:
+- A homepage/dashboard with navigation to each game
+- Simple login and mock user account system (no actual authentication needed, just usernames and balances)
+- Each user starts with a mock balance (e.g. 1,000 coins)
+- Balance updates with each win/loss
+- "Cashout" button in Mines and Crash to take winnings
+- Results for each game should be **provably fair**, using:
+  - A server seed, client seed, and nonce
+  - A SHA-256 hash-based HMAC to generate game outcomes
+
+Gamewide currency: coin as in-game currency with ratio of 1:1 (PHP or Philippine Peso)
+Note: 1 PHP = 1 coin
+
+Additional Important Note:
+The $MEOW is like a grand jackpot in the whole ecasino platform - winning it will reset the prize to 0.1 $MEOW then gradually accumulate based on the slots earnings/players losses.
+
+Features:
+User:
+Registration and Log in
+Wallet - to see assets and balances, Conversion of $MEOW to coin
+Top-up/Deposit Page - select/insert desired amount then choose payment method then upload receipt then top up
+
+Admin:
+View and monitor user activities
+GameBank - view user deposits, view uploaded receipt then choose if confirm or reject (if selected confirm, add the deposit amount to user account)
+Manage User - ban user or suspend users
+
+Additional:
+Allow convertion of $MEOW to coins (in-game currency) with ratio of 1:5000 (1 $MEOW is to 5000 coins)
+Also add withdraw function
+
+Important Note:
+Include the database file with the project files/folder
+Add an admin account with this credentials:
+username: admin
+password: admin1234
+
+
+Make sure it is engaging and interactive with good visual design 
+Create a database and place it together with the project files.
+Create it with traditional php but use tailwind css for visual designs.
+Use Node.js also

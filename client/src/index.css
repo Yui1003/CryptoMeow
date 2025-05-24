@@ -1,0 +1,171 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  /* True Black-Pink Theme */
+  --background: 0 0% 6%; /* Pure black background */
+  --foreground: 330 100% 85%; /* Bright pink text */
+  --muted: 0 0% 12%; /* Dark gray */
+  --muted-foreground: 330 50% 70%; /* Muted pink */
+  --popover: 0 0% 8%; /* Dark popover */
+  --popover-foreground: 330 100% 85%; /* Pink text */
+  --card: 0 0% 8%; /* Dark cards */
+  --card-foreground: 330 100% 85%; /* Pink text */
+  --border: 330 100% 70%; /* Pink borders */
+  --input: 0 0% 12%; /* Dark inputs */
+  --primary: 330 100% 70%; /* Bright pink primary */
+  --primary-foreground: 0 0% 6%; /* Black text on pink */
+  --secondary: 0 0% 12%; /* Dark secondary */
+  --secondary-foreground: 330 100% 85%; /* Pink text */
+  --accent: 330 100% 80%; /* Light pink accent */
+  --accent-foreground: 0 0% 6%; /* Black text */
+  --destructive: 0 84% 60%; /* Red */
+  --destructive-foreground: 0 0% 100%; /* White text */
+  --ring: 330 100% 70%; /* Pink ring */
+  --radius: 0.5rem;
+  
+  /* Custom crypto colors - TRUE BLACK AND PINK */
+  --crypto-black: 0 0% 6%; /* #0f0f0f - Pure black */
+  --crypto-gray: 0 0% 12%; /* #1f1f1f - Dark gray */
+  --crypto-pink: 330 100% 70%; /* #ff1493 - Hot pink */
+  --crypto-pink-light: 330 100% 80%; /* #ff69b4 - Light pink */
+  --crypto-green: 120 100% 50%; /* #00ff00 - Bright green */
+  --crypto-gold: 255 170 0; /* Removed - using pink instead */
+  --crypto-red: 0 84% 60%; /* #ff4444 - Red */
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+
+  body {
+    @apply font-sans antialiased;
+    background-color: hsl(var(--background)) !important;
+    color: hsl(var(--foreground)) !important;
+  }
+}
+
+@layer components {
+  .gradient-pink {
+    background: linear-gradient(135deg, hsl(var(--crypto-pink)) 0%, hsl(var(--crypto-pink-light)) 100%);
+  }
+  
+  .gradient-gold {
+    background: linear-gradient(135deg, hsl(var(--crypto-gold)) 0%, #ffd700 100%);
+  }
+  
+  .glow-pink {
+    box-shadow: 0 0 20px hsla(var(--crypto-pink), 0.3);
+  }
+  
+  .glow-green {
+    box-shadow: 0 0 20px hsla(var(--crypto-green), 0.3);
+  }
+  
+  .text-glow {
+    text-shadow: 0 0 10px currentColor;
+  }
+  
+  .glass {
+    backdrop-filter: blur(10px);
+    background: hsla(var(--crypto-gray), 0.8);
+  }
+  
+  .game-card {
+    transition: transform 0.3s ease;
+  }
+  
+  .game-card:hover {
+    transform: translateY(-4px);
+  }
+  
+  .crypto-black {
+    background-color: hsl(var(--crypto-black));
+  }
+  
+  .crypto-gray {
+    background-color: hsl(var(--crypto-gray));
+  }
+  
+  .crypto-pink {
+    background-color: hsl(var(--crypto-pink));
+  }
+  
+  .crypto-pink-light {
+    background-color: hsl(var(--crypto-pink-light));
+  }
+  
+  .crypto-green {
+    color: hsl(var(--crypto-green));
+  }
+  
+  .crypto-gold {
+    color: hsl(var(--crypto-gold));
+  }
+  
+  .crypto-red {
+    color: hsl(var(--crypto-red));
+  }
+  
+  .text-crypto-pink {
+    color: hsl(var(--crypto-pink));
+  }
+  
+  .text-crypto-green {
+    color: hsl(var(--crypto-green));
+  }
+  
+  .text-crypto-gold {
+    color: hsl(var(--crypto-gold));
+  }
+  
+  .text-crypto-red {
+    color: hsl(var(--crypto-red));
+  }
+  
+  .border-crypto-pink {
+    border-color: hsl(var(--crypto-pink));
+  }
+  
+  .hover\:bg-crypto-pink:hover {
+    background-color: hsl(var(--crypto-pink));
+  }
+  
+  .hover\:bg-crypto-pink-light:hover {
+    background-color: hsl(var(--crypto-pink-light));
+  }
+}
+
+@layer utilities {
+  .animate-pulse-slow {
+    animation: pulse 3s ease-in-out infinite;
+  }
+  
+  .animate-glow {
+    animation: glow 2s ease-in-out infinite alternate;
+  }
+  
+  .animate-jackpot {
+    animation: jackpot 1s ease-in-out infinite;
+  }
+  
+  @keyframes glow {
+    0% {
+      box-shadow: 0 0 5px hsl(var(--crypto-pink));
+    }
+    100% {
+      box-shadow: 0 0 20px hsl(var(--crypto-pink)), 0 0 30px hsl(var(--crypto-pink));
+    }
+  }
+  
+  @keyframes jackpot {
+    0%, 100% {
+      transform: scale(1);
+    }
+    50% {
+      transform: scale(1.05);
+    }
+  }
+}
