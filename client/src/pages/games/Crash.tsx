@@ -79,7 +79,12 @@ export default function Crash() {
     // Start the multiplier animation
     intervalRef.current = setInterval(() => {
       const elapsed = (Date.now() - startTimeRef.current) / 1000;
-      const newMultiplier = 1 + (elapsed * 0.5); // Rises at 0.5x per second
+      const newMultiplier = 1 + (Math.pow(1.0678, elapsed) - 1); // Exponential growth
+      
+      // Ensure minimum 3 second game time
+      if (elapsed < 3 && newMultiplier >= crash) {
+        return;
+      }
       
       setCurrentMultiplier(newMultiplier);
       

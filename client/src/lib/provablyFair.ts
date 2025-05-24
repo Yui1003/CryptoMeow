@@ -47,10 +47,15 @@ export function minesResult(result: number, totalTiles: number, mineCount: numbe
 }
 
 export function crashResult(result: number): number {
-  // Convert 0-1 result to crash multiplier (minimum 1.01x)
-  const maxMultiplier = 100;
-  const multiplier = 1 + (result * (maxMultiplier - 1));
-  return Math.max(1.01, multiplier);
+  // Using house edge formula to generate fair crash points
+  const houseEdge = 0.04; // 4% house edge
+  const e = 2.718281828459045; // Math.E
+  
+  // Convert 0-1 result to crash point using inverse formula
+  const crash = 1 / (1 - result * (1 - houseEdge));
+  
+  // Ensure minimum crash point is 1.01x and max is 100x
+  return Math.min(Math.max(1.01, crash), 100);
 }
 
 export function wheelResult(result: number, segments: number[]): number {

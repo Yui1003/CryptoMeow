@@ -85,7 +85,7 @@ export default function Wheel() {
     
     const serverSeed = generateServerSeed();
     const clientSeed = generateClientSeed();
-    const nonce = Date.now();
+    const nonce = Math.floor(Math.random() * 1000000);
     
     const result = calculateResult(serverSeed, clientSeed, nonce);
     const segments = RISK_LEVELS[riskLevel];
