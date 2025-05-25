@@ -296,7 +296,60 @@ export default function Admin() {
                       <TableCell>{withdrawal.userId}</TableCell>
                       <TableCell>{parseFloat(withdrawal.amount).toFixed(2)} coins</TableCell>
                       <TableCell>{withdrawal.platform || 'N/A'}</TableCell>
-                      <TableCell>{withdrawal.accountInfo || 'N/A'}</TableCell>
+                      <TableCell>
+                        {withdrawal.accountInfo ? (
+                          <Dialog>
+                            <DialogTrigger asChild>
+                              <Button size="sm" variant="outline">
+                                <Eye className="w-4 h-4 mr-1" />
+                                View Details
+                              </Button>
+                            </DialogTrigger>
+                            <DialogContent className="max-w-md">
+                              <DialogHeader>
+                                <DialogTitle>Account Information</DialogTitle>
+                              </DialogHeader>
+                              <div className="space-y-3">
+                                {(() => {
+                                  try {
+                                    const accountInfo = JSON.parse(withdrawal.accountInfo);
+                                    return (
+                                      <div className="space-y-2">
+                                        <div className="flex justify-between">
+                                          <span className="font-medium text-gray-400">Account Number:</span>
+                                          <span className="text-white">{accountInfo.accountNumber}</span>
+                                        </div>
+                                        <div className="flex justify-between">
+                                          <span className="font-medium text-gray-400">Account Name:</span>
+                                          <span className="text-white">{accountInfo.accountName}</span>
+                                        </div>
+                                        {accountInfo.bankName && (
+                                          <div className="flex justify-between">
+                                            <span className="font-medium text-gray-400">Bank Name:</span>
+                                            <span className="text-white">{accountInfo.bankName}</span>
+                                          </div>
+                                        )}
+                                        <div className="flex justify-between">
+                                          <span className="font-medium text-gray-400">Platform:</span>
+                                          <span className="text-white capitalize">{withdrawal.platform?.replace('_', ' ')}</span>
+                                        </div>
+                                      </div>
+                                    );
+                                  } catch (e) {
+                                    return (
+                                      <div className="text-gray-400">
+                                        {withdrawal.accountInfo}
+                                      </div>
+                                    );
+                                  }
+                                })()}
+                              </div>
+                            </DialogContent>
+                          </Dialog>
+                        ) : (
+                          <span className="text-gray-400">N/A</span>
+                        )}
+                      </TableCell>
                       <TableCell>
                         <Badge 
                           variant={
