@@ -271,7 +271,7 @@ export default function Home() {
                   <GameCard
                     title="Mines"
                     description="Navigate the minefield and cash out before hitting a bomb. The more tiles you reveal, the higher your multiplier!"
-                    imageUrl="https://images.unsplash.com/photo-1621761191319-c6fb62004040?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&h=400"
+                    imageUrl="https://images.sigma.world/mines.jpg"
                     players={247}
                     maxWin="24.75x"
                     gameUrl="/games/mines"
@@ -285,7 +285,7 @@ export default function Home() {
                   <GameCard
                     title="Crash"
                     description="Watch the multiplier rise and cash out before it crashes! Will you be greedy or play it safe?"
-                    imageUrl="https://images.unsplash.com/photo-1611974789855-9c2a0a7236a3?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&h=400"
+                    imageUrl="https://p2enews.com/wp-content/uploads/2023/01/Crash-Crypto-Game.png"
                     players={189}
                     maxWin="2.47x"
                     gameUrl="/games/crash"
@@ -299,7 +299,7 @@ export default function Home() {
                   <GameCard
                     title="Wheel of Fortune"
                     description="Spin the wheel and let fortune decide your fate! Choose your risk level and potential rewards."
-                    imageUrl="https://images.unsplash.com/photo-1596838132731-3301c3fd4317?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&h=400"
+                    imageUrl="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcR2IfhpM8WLAZZkTnVX8-5Wj1fMiJ-3vTJH6Q&s"
                     players={156}
                     maxWin="50.00x"
                     gameUrl="/games/wheel"
@@ -313,7 +313,7 @@ export default function Home() {
                   <GameCard
                     title="Hi-Lo"
                     description="Guess if the next card is higher or lower than the current one. Simple rules, endless excitement!"
-                    imageUrl="https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&h=400"
+                    imageUrl="https://storage.googleapis.com/kickthe/assets/images/games/hi-lo-hacksawgaming/gb/gbp/tile_large.jpg"
                     players={201}
                     winRate="~49%"
                     gameUrl="/games/hilo"
@@ -327,7 +327,7 @@ export default function Home() {
                   <GameCard
                     title="Dice Roll"
                     description="Roll the dice and predict the outcome! Choose your risk range for bigger rewards."
-                    imageUrl="https://images.unsplash.com/photo-1522069169874-c58ec4b76be5?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&h=400"
+                    imageUrl="https://i.ytimg.com/vi/PM8n5JvW2tA/maxresdefault.jpg"
                     players={134}
                     maxWin="Range: 1-100"
                     gameUrl="/games/dice"
