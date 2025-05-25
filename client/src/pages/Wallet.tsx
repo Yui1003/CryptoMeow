@@ -19,10 +19,12 @@ export default function Wallet() {
 
   const { data: gameHistory = [] } = useQuery<GameHistory[]>({
     queryKey: ["/api/games/history"],
+    refetchOnWindowFocus: true,
   });
 
   const { data: withdrawalHistory = [] } = useQuery<Withdrawal[]>({
     queryKey: ["/api/withdrawals/user"],
+    refetchOnWindowFocus: true,
   });
 
   const totalWinnings = gameHistory.reduce((sum, game) => sum + parseFloat(game.winAmount), 0);
@@ -160,6 +162,7 @@ export default function Wallet() {
                   <TableHeader>
                     <TableRow>
                       <TableHead>Amount</TableHead>
+                      <TableHead>Platform</TableHead>
                       <TableHead>Status</TableHead>
                       <TableHead>Request Date</TableHead>
                       <TableHead>Processing Time</TableHead>
@@ -170,6 +173,11 @@ export default function Wallet() {
                       <TableRow key={withdrawal.id}>
                         <TableCell className="font-medium">
                           {parseFloat(withdrawal.amount).toFixed(2)} coins
+                        </TableCell>
+                        <TableCell>
+                          <Badge variant="outline" className="capitalize">
+                            {withdrawal.platform?.replace('_', ' ') || 'N/A'}
+                          </Badge>
                         </TableCell>
                         <TableCell>
                           <Badge 

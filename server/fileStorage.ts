@@ -214,11 +214,13 @@ export class FileStorage {
     }
   }
 
-  async createWithdrawal(withdrawal: InsertWithdrawal & { userId: number }): Promise<Withdrawal> {
+  async createWithdrawal(withdrawal: InsertWithdrawal & { userId: number; platform: string; accountInfo: string }): Promise<Withdrawal> {
     const id = this.data.currentWithdrawalId++;
     const newWithdrawal: Withdrawal = {
       ...withdrawal,
       id,
+      platform: withdrawal.platform,
+      accountInfo: withdrawal.accountInfo,
       status: "pending",
       createdAt: new Date(),
     };

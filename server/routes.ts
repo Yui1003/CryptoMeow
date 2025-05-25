@@ -275,6 +275,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(400).json({ message: "Insufficient balance" });
       }
 
+      // Validate account info JSON
+      try {
+        JSON.parse(withdrawalData.accountInfo);
+      } catch (e) {
+        return res.status(400).json({ message: "Invalid account information format" });
+      }
+
       // Only create withdrawal request - don't deduct funds yet
       const withdrawal = await storage.createWithdrawal({
         ...withdrawalData,

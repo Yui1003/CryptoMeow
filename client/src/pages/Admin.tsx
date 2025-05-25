@@ -62,29 +62,36 @@ export default function Admin() {
   });
 
   const updateDepositMutation = useMutation({
-    mutationFn: async ({ depositId, status }: { depositId: number; status: string }) => {
-      const response = await apiRequest("PATCH", `/api/deposits/${depositId}/status`, { status });
+    mutationFn: async (data: { depositId: number; status: string }) => {
+      const response = await apiRequest("PATCH", `/api/deposits/${data.depositId}/status`, {
+        status: data.status
+      });
       return response.json();
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/deposits"] });
+      queryClient.invalidateQueries({ queryKey: ["/api/auth/me"] });
       toast({
         title: "Success",
-        description: "Deposit status updated successfully",
+        description: "Deposit status updated successfully!",
       });
     },
   });
 
   const updateWithdrawalMutation = useMutation({
-    mutationFn: async ({ withdrawalId, status }: { withdrawalId: number; status: string }) => {
-      const response = await apiRequest("PATCH", `/api/withdrawals/${withdrawalId}/status`, { status });
+    mutationFn: async (data: { withdrawalId: number; status: string }) => {
+      const response = await apiRequest("PATCH", `/api/withdrawals/${data.withdrawalId}/status`, {
+        status: data.status
+      });
       return response.json();
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/withdrawals"] });
+      queryClient.invalidateQueries({ queryKey: ["/api/withdrawals/user"] });
+      queryClient.invalidateQueries({ queryKey: ["/api/auth/me"] });
       toast({
         title: "Success",
-        description: "Withdrawal status updated successfully",
+        description: "Withdrawal status updated successfully!",
       });
     },
   });
@@ -276,6 +283,8 @@ export default function Admin() {
                   <TableRow>
                     <TableHead>User ID</TableHead>
                     <TableHead>Amount</TableHead>
+                    <TableHead>Platform</TableHead>
+                    <TableHead>Account Info</TableHead>
                     <TableHead>Status</TableHead>
                     <TableHead>Date</TableHead>
                     <TableHead>Actions</TableHead>
@@ -286,6 +295,8 @@ export default function Admin() {
                     <TableRow key={withdrawal.id}>
                       <TableCell>{withdrawal.userId}</TableCell>
                       <TableCell>{parseFloat(withdrawal.amount).toFixed(2)} coins</TableCell>
+                      <TableCell>{withdrawal.platform || 'N/A'}</TableCell>
+                      <TableCell>{withdrawal.accountInfo || 'N/A'}</TableCell>
                       <TableCell>
                         <Badge 
                           variant={

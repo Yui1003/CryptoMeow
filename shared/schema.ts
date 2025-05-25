@@ -27,6 +27,8 @@ export const withdrawals = mysqlTable("withdrawals", {
   id: int("id").primaryKey().autoincrement(),
   userId: int("user_id").notNull(),
   amount: decimal("amount", { precision: 12, scale: 2 }).notNull(),
+  platform: text("platform").notNull(), // gcash, maya, bank_transfer, etc.
+  accountInfo: text("account_info").notNull(), // JSON string with platform-specific info
   status: text("status").notNull().default("pending"), // pending, approved, rejected
   createdAt: timestamp("created_at").notNull().defaultNow(),
 });
@@ -74,8 +76,10 @@ export const insertDepositSchema = z.object({
   receiptUrl: z.string().optional(),
 });
 
-export const insertWithdrawalSchema = createInsertSchema(withdrawals).pick({
-  amount: true,
+export const insertWithdrawalSchema = z.object({
+  amount: z.string().min(1, "Amount is required"),
+  platform: z.string().min(1, "Platform is required"),
+  accountInfo: z.string().min(1, "Account information is required"),
 });
 
 export const insertGameHistorySchema = createInsertSchema(gameHistory).pick({

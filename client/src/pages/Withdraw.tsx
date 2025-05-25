@@ -7,6 +7,8 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Textarea } from "@/components/ui/textarea";
 import { Download, AlertTriangle } from "lucide-react";
 
 export default function Withdraw() {
@@ -14,19 +16,28 @@ export default function Withdraw() {
   const { toast } = useToast();
   const queryClient = useQueryClient();
   const [amount, setAmount] = useState("");
+  const [platform, setPlatform] = useState("");
+  const [accountNumber, setAccountNumber] = useState("");
+  const [accountName, setAccountName] = useState("");
+  const [bankName, setBankName] = useState("");
 
   const withdrawMutation = useMutation({
-    mutationFn: async (data: { amount: string }) => {
+    mutationFn: async (data: { amount: string; platform: string; accountInfo: string }) => {
       const response = await apiRequest("POST", "/api/withdrawals", data);
       return response.json();
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/auth/me"] });
+      queryClient.invalidateQueries({ queryKey: ["/api/withdrawals/user"] });
       toast({
         title: "Success",
         description: "Withdrawal request submitted successfully!",
       });
       setAmount("");
+      setPlatform("");
+      setAccountNumber("");
+      setAccountName("");
+      setBankName("");
     },
     onError: (error: any) => {
       toast({
@@ -39,10 +50,20 @@ export default function Withdraw() {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    if (!amount) {
+    
+    if (!amount || !platform || !accountNumber || !accountName) {
       toast({
         title: "Error",
-        description: "Please enter an amount",
+        description: "Please fill in all required fields",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    if (platform === "bank_transfer" && !bankName) {
+      toast({
+        title: "Error",
+        description: "Bank name is required for bank transfers",
         variant: "destructive",
       });
       return;
@@ -67,7 +88,13 @@ export default function Withdraw() {
       return;
     }
 
-    withdrawMutation.mutate({ amount });
+    const accountInfo = JSON.stringify({
+      accountNumber,
+      accountName,
+      ...(platform === "bank_transfer" && { bankName })
+    });
+
+    withdrawMutation.mutate({ amount, platform, accountInfo });
   };
 
   if (!user) return null;
@@ -105,6 +132,74 @@ export default function Withdraw() {
             </div>
 
             <form onSubmit={handleSubmit} className="space-y-6">
+              <div>
+                <Label htmlFor="platform">Withdrawal Platform *</Label>
+                <Select value={platform} onValueChange={setPlatform} required>
+                  <SelectTrigger className="crypto-black border-crypto-pink/30 focus:border-crypto-pink">
+                    <SelectValue placeholder="Select withdrawal platform" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="gcash">GCash</SelectItem>
+                    <SelectItem value="maya">Maya (PayMaya)</SelectItem>
+                    <SelectItem value="bank_transfer">Bank Transfer</SelectItem>
+                    <SelectItem value="paymongo">PayMongo</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+
+              <div>
+                <Label htmlFor="accountNumber">
+                  {platform === "bank_transfer" ? "Account Number" : 
+                   platform === "gcash" ? "GCash Number" :
+                   platform === "maya" ? "Maya Number" :
+                   platform === "paymongo" ? "PayMongo Account" :
+                   "Account Number"} *
+                </Label>
+                <Input
+                  id="accountNumber"
+                  type="text"
+                  value={accountNumber}
+                  onChange={(e) => setAccountNumber(e.target.value)}
+                  placeholder={
+                    platform === "bank_transfer" ? "Enter your account number" :
+                    platform === "gcash" ? "Enter your GCash number (09xxxxxxxxx)" :
+                    platform === "maya" ? "Enter your Maya number (09xxxxxxxxx)" :
+                    platform === "paymongo" ? "Enter your PayMongo account" :
+                    "Enter account details"
+                  }
+                  className="crypto-black border-crypto-pink/30 focus:border-crypto-pink"
+                  required
+                />
+              </div>
+
+              <div>
+                <Label htmlFor="accountName">Account Name *</Label>
+                <Input
+                  id="accountName"
+                  type="text"
+                  value={accountName}
+                  onChange={(e) => setAccountName(e.target.value)}
+                  placeholder="Enter the full name on the account"
+                  className="crypto-black border-crypto-pink/30 focus:border-crypto-pink"
+                  required
+                />
+              </div>
+
+              {platform === "bank_transfer" && (
+                <div>
+                  <Label htmlFor="bankName">Bank Name *</Label>
+                  <Input
+                    id="bankName"
+                    type="text"
+                    value={bankName}
+                    onChange={(e) => setBankName(e.target.value)}
+                    placeholder="Enter your bank name (e.g., BPI, BDO, Metrobank)"
+                    className="crypto-black border-crypto-pink/30 focus:border-crypto-pink"
+                    required
+                  />
+                </div>
+              )}
+
               <div>
                 <Label htmlFor="amount">Withdrawal Amount (Coins)</Label>
                 <Input

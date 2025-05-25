@@ -4,8 +4,8 @@
       "username": "user1",
       "password": "$2b$10$vUYPxsJCmX7SRMw5gP.TE.7MwldCD7zFHGPykGCFP5nvcBwPQrSMi",
       "id": 2,
-      "balance": "1900.35",
-      "meowBalance": "0.75000000",
+      "balance": "1800.35",
+      "meowBalance": "0.00000000",
       "isAdmin": false,
       "isBanned": false,
       "createdAt": "2025-05-24T19:43:56.278Z"
@@ -14,7 +14,7 @@
       "id": 1,
       "username": "admin",
       "password": "$2b$10$yiQUwI1/UJh4Y01jeDNBBOSO5rNsMOnsMpHRB7BCJhLY8El7J.oUi",
-      "balance": "2700.10",
+      "balance": "2500.10",
       "meowBalance": "3.54635106",
       "isAdmin": true,
       "isBanned": false,
@@ -70,6 +70,20 @@
   ],
   "withdrawals": [
     {
+      "amount": "200",
+      "userId": 1,
+      "id": 6,
+      "status": "approved",
+      "createdAt": "2025-05-25T20:55:45.960Z"
+    },
+    {
+      "amount": "100",
+      "userId": 2,
+      "id": 5,
+      "status": "approved",
+      "createdAt": "2025-05-25T20:54:01.368Z"
+    },
+    {
       "amount": "60",
       "userId": 1,
       "id": 4,
@@ -96,6 +110,15 @@
       "id": 1,
       "status": "rejected",
       "createdAt": "2025-05-25T20:29:15.423Z"
+    },
+    {
+      "amount": "100",
+      "platform": "gcash",
+      "accountInfo": "{\"accountNumber\":\"09999999999\",\"accountName\":\"Maurice\"}",
+      "userId": 1,
+      "id": 7,
+      "status": "pending",
+      "createdAt": "2025-05-25T21:04:25.966Z"
     }
   ],
   "gameHistory": [
@@ -2202,7 +2225,7 @@
   },
   "currentUserId": 3,
   "currentDepositId": 6,
-  "currentWithdrawalId": 5,
+  "currentWithdrawalId": 8,
   "currentGameHistoryId": 162,
   "farmCats": [
     {
@@ -2249,7 +2272,16 @@
       "production": 0.0096,
       "lastClaim": "2025-05-25T20:31:36.359Z",
       "createdAt": "2025-05-25T16:26:08.727Z"
+    },
+    {
+      "id": 6,
+      "userId": 2,
+      "catId": "business",
+      "level": 1,
+      "production": 0.005,
+      "lastClaim": "2025-05-25T20:53:04.895Z",
+      "createdAt": "2025-05-25T20:53:04.895Z"
     }
   ],
-  "currentFarmCatId": 6
+  "currentFarmCatId": 7
 }
