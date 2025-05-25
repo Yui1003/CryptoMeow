@@ -39,14 +39,14 @@ export default function HiLo() {
   const { user } = useAuth();
   const { toast } = useToast();
   const queryClient = useQueryClient();
-  
+
   const [selectedBet, setSelectedBet] = useState(1.00);
   const [gameState, setGameState] = useState<GameState>("waiting");
   const [currentCard, setCurrentCard] = useState<Card | null>(null);
   const [nextCard, setNextCard] = useState<Card | null>(null);
   const [streak, setStreak] = useState(0);
   const [multiplier, setMultiplier] = useState(1.0);
-  const [gameHistory, setGameHistory] = useState<boolean[]>([]);
+  const [gameHistory, setGameHistory] = useState<{correct: boolean, guess: 'higher' | 'lower', currentCard: number, nextCard: number, currentCardName: string, nextCardName: string}[]>([]);
   const [serverSeed, setServerSeed] = useState("");
   const [clientSeed, setClientSeed] = useState("");
   const [nonce, setNonce] = useState(0);
@@ -89,15 +89,15 @@ export default function HiLo() {
     const newServerSeed = generateServerSeed();
     const newClientSeed = generateClientSeed();
     const newNonce = 1;
-    
+
     setServerSeed(newServerSeed);
     setClientSeed(newClientSeed);
     setNonce(newNonce);
-    
+
     const result = calculateResult(newServerSeed, newClientSeed, newNonce);
     const cardValue = hiloResult(result);
     const card = generateCard(cardValue);
-    
+
     setCurrentCard(card);
     setNextCard(null);
     setGameState("playing");
@@ -108,52 +108,62 @@ export default function HiLo() {
 
   const makeGuess = (isHigher: boolean) => {
     if (!currentCard || gameState !== "playing") return;
+
+    let nextNonce = nonce + streak + Math.floor(Math.random() * 1000) + 1;
+    let result = calculateResult(serverSeed, clientSeed, nextNonce);
+    let nextValue = hiloResult(result);
     
-    const nextNonce = nonce + streak + 1;
-    const result = calculateResult(serverSeed, clientSeed, nextNonce);
-    const nextValue = hiloResult(result);
-    const next = generateCard(nextValue);
-    
-    setNextCard(next);
-    
-    const isCorrect = isHigher ? next.value > currentCard.value : next.value < currentCard.value;
-    const isTie = next.value === currentCard.value;
-    
-    if (isTie) {
-      // Tie - no win/loss, continue with same multiplier
-      toast({
-        title: "🤝 It's a Tie!",
-        description: "Same value! Continue playing.",
-      });
-      setCurrentCard(next);
-      setNextCard(null);
-      return;
+    // Keep generating new cards until we don't get a tie
+    while (nextValue === currentCard.value) {
+      nextNonce += 1;
+      result = calculateResult(serverSeed, clientSeed, nextNonce);
+      nextValue = hiloResult(result);
     }
-    
+
+    const next = generateCard(nextValue);
+    setNextCard(next);
+    setNonce(nextNonce); // Update nonce state
+
+    const isCorrect = isHigher ? next.value > currentCard.value : next.value < currentCard.value;
+
     if (isCorrect) {
       const newStreak = streak + 1;
       const newMultiplier = 1 + (newStreak * 0.5); // 0.5x increase per correct guess
-      
+
       setStreak(newStreak);
       setMultiplier(newMultiplier);
-      setGameHistory(prev => [...prev, true]);
-      
+      setGameHistory(prev => [...prev, {
+        correct: true,
+        guess: isHigher ? 'higher' : 'lower',
+        currentCard: currentCard.value,
+        nextCard: next.value,
+        currentCardName: currentCard.name,
+        nextCardName: next.name
+      }]);
+
       toast({
         title: "✅ Correct!",
         description: `Streak: ${newStreak} | Multiplier: ${newMultiplier.toFixed(1)}x`,
       });
-      
+
       setTimeout(() => {
         setCurrentCard(next);
         setNextCard(null);
       }, 2000);
     } else {
       // Wrong guess - game over
-      setGameHistory(prev => [...prev, false]);
+      setGameHistory(prev => [...prev, {
+        correct: false,
+        guess: isHigher ? 'higher' : 'lower',
+        currentCard: currentCard.value,
+        nextCard: next.value,
+        currentCardName: currentCard.name,
+        nextCardName: next.name
+      }]);
       setGameState("ended");
-      
+
       const winAmount = streak > 0 ? selectedBet * multiplier : 0;
-      
+
       if (streak > 0) {
         toast({
           title: "🎉 Game Over!",
@@ -186,10 +196,10 @@ export default function HiLo() {
 
   const cashOut = () => {
     if (gameState !== "playing" || streak === 0) return;
-    
+
     const winAmount = selectedBet * multiplier;
     setGameState("ended");
-    
+
     toast({
       title: "💰 Cashed Out!",
       description: `You won ${winAmount.toFixed(2)} coins with ${streak} correct guesses!`,
@@ -232,7 +242,7 @@ export default function HiLo() {
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-        
+
         {/* Game Display */}
         <div className="lg:col-span-2">
           <Card className="crypto-gray border-crypto-pink/20">
@@ -297,7 +307,7 @@ export default function HiLo() {
                         <div className="flex justify-center space-x-4">
                           <Button
                             onClick={() => makeGuess(true)}
-                            className="bg-crypto-green hover:bg-green-500 text-black font-semibold px-8 py-3"
+                            className="bg-crypto-green hover:bg-green-500 text-white font-semibold px-8 py-3"
                           >
                             <TrendingUp className="w-5 h-5 mr-2" />
                             Higher
@@ -317,16 +327,45 @@ export default function HiLo() {
 
                 {/* Game History */}
                 {gameHistory.length > 0 && (
-                  <div className="mt-8 text-center">
-                    <h3 className="text-sm font-medium text-gray-400 mb-2">Guess History</h3>
-                    <div className="flex justify-center space-x-1">
-                      {gameHistory.map((correct, index) => (
+                  <div className="mt-8">
+                    <h3 className="text-sm font-medium text-gray-400 mb-4 text-center">Guess History</h3>
+                    <div className="max-h-40 overflow-y-auto space-y-2">
+                      {gameHistory.map((guess, index) => (
                         <div
                           key={index}
-                          className={`w-4 h-4 rounded-full ${
-                            correct ? "bg-crypto-green" : "bg-crypto-red"
+                          className={`p-3 rounded-lg border-l-4 ${
+                            guess.correct 
+                              ? "bg-green-900/20 border-crypto-green" 
+                              : "bg-red-900/20 border-crypto-red"
                           }`}
-                        />
+                        >
+                          <div className="flex items-center justify-between text-sm">
+                            <div className="flex items-center space-x-2">
+                              <span className={guess.correct ? "crypto-green" : "crypto-red"}>
+                                {guess.correct ? "✅" : "❌"}
+                              </span>
+                              <span className="text-gray-300">
+                                Guess #{index + 1}:
+                              </span>
+                              <span className="capitalize font-medium">
+                                {guess.guess}
+                              </span>
+                            </div>
+                            <div className="text-gray-400 text-xs">
+                              {guess.currentCardName} → {guess.nextCardName}
+                            </div>
+                          </div>
+                          <div className="mt-1 text-xs text-gray-500">
+                            {guess.currentCard} vs {guess.nextCard} | 
+                            {guess.guess === 'higher' 
+                              ? ` Expected ${guess.nextCard} > ${guess.currentCard}`
+                              : ` Expected ${guess.nextCard} < ${guess.currentCard}`
+                            } | 
+                            <span className={guess.correct ? "crypto-green" : "crypto-red"}>
+                              {guess.correct ? " Correct!" : " Wrong!"}
+                            </span>
+                          </div>
+                        </div>
                       ))}
                     </div>
                   </div>

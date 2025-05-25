@@ -6,11 +6,16 @@ export interface GameResult {
 }
 
 export function generateServerSeed(): string {
-  return Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15);
+  const timestamp = Date.now().toString(36);
+  const random1 = Math.random().toString(36).substring(2, 15);
+  const random2 = Math.random().toString(36).substring(2, 15);
+  return timestamp + random1 + random2;
 }
 
 export function generateClientSeed(): string {
-  return Math.random().toString(36).substring(2, 15);
+  const timestamp = Date.now().toString(36);
+  const random = Math.random().toString(36).substring(2, 15);
+  return timestamp + random;
 }
 
 // Simple hash function for browser compatibility
