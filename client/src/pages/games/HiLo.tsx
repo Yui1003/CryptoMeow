@@ -151,7 +151,7 @@ export default function HiLo() {
         setNextCard(null);
       }, 2000);
     } else {
-      // Wrong guess - game over
+      // Wrong guess - game over, no winnings
       setGameHistory(prev => [...prev, {
         correct: false,
         guess: isHigher ? 'higher' : 'lower',
@@ -162,20 +162,14 @@ export default function HiLo() {
       }]);
       setGameState("ended");
 
-      const winAmount = streak > 0 ? selectedBet * multiplier : 0;
+      // Wrong guess always results in 0 winnings, regardless of streak
+      const winAmount = 0;
 
-      if (streak > 0) {
-        toast({
-          title: "🎉 Game Over!",
-          description: `You won ${winAmount.toFixed(2)} coins with ${streak} correct guesses!`,
-        });
-      } else {
-        toast({
-          title: "💥 Wrong!",
-          description: "Better luck next time!",
-          variant: "destructive",
-        });
-      }
+      toast({
+        title: "💥 Wrong!",
+        description: "You lost your bet! Better luck next time!",
+        variant: "destructive",
+      });
 
       playGameMutation.mutate({
         gameType: "hilo",

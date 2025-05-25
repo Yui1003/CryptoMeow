@@ -335,7 +335,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
       // Update user balance
       const winAmount = parseFloat(gameData.winAmount || "0");
-      const newBalance = (parseFloat(user.balance) - betAmount + winAmount).toFixed(2);
+      // For HiLo, if the player cashed out, they should get the full win amount
+      // If they lost (winAmount = 0), they lose their bet
+      const balanceChange = winAmount > 0 ? (winAmount - betAmount) : -betAmount;
+      const newBalance = (parseFloat(user.balance) + balanceChange).toFixed(2);
       const newMeowBalance = jackpotWin 
         ? (parseFloat(user.meowBalance) + parseFloat(meowWon)).toFixed(8)
         : user.meowBalance;
