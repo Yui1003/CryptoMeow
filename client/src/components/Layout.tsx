@@ -17,8 +17,55 @@ import {
   TrendingUp,
   Upload,
   Download,
-  Shield
+  Shield,
+  Sparkles,
+  Coins,
+  Cat
 } from "lucide-react";
+import { useState, useEffect } from "react";
+
+// Particle component
+const Particle = ({ delay }: { delay: number }) => {
+  const [style, setStyle] = useState({});
+
+  useEffect(() => {
+    const randomX = Math.random() * 100;
+    const randomSize = Math.random() * 4 + 2;
+    const randomDuration = Math.random() * 10 + 15;
+
+    setStyle({
+      left: `${randomX}%`,
+      width: `${randomSize}px`,
+      height: `${randomSize}px`,
+      animationDelay: `${delay}s`,
+      animationDuration: `${randomDuration}s`,
+    });
+  }, [delay]);
+
+  return <div className="particle" style={style} />;
+};
+
+// Coin rain component
+const CoinRain = ({ delay }: { delay: number }) => {
+  const [style, setStyle] = useState({});
+
+  useEffect(() => {
+    const randomX = Math.random() * 100;
+    const randomDuration = Math.random() * 4 + 6;
+
+    setStyle({
+      left: `${randomX}%`,
+      animationDelay: `${delay}s`,
+      animationDuration: `${randomDuration}s`,
+    });
+  }, [delay]);
+
+  return (
+    <div className="coin-rain" style={style}>
+      💰
+    </div>
+  );
+};
 
 interface LayoutProps {
   children: React.ReactNode;
@@ -27,6 +74,14 @@ interface LayoutProps {
 export default function Layout({ children }: LayoutProps) {
   const { user, logout } = useAuth();
   const [location] = useLocation();
+  const [particles, setParticles] = useState<number[]>([]);
+  const [coins, setCoins] = useState<number[]>([]);
+
+  // Initialize particles and coin rain
+  useEffect(() => {
+    setParticles(Array.from({ length: 20 }, (_, i) => i));
+    setCoins(Array.from({ length: 8 }, (_, i) => i));
+  }, []);
 
   if (!user && !["/login", "/register"].includes(location)) {
     return (
@@ -55,9 +110,33 @@ export default function Layout({ children }: LayoutProps) {
   }
 
   return (
-    <div className="min-h-screen crypto-black text-white">
+    <div className="min-h-screen background-animated text-white relative">
+      {/* Global Particle System */}
+      {user && (
+        <>
+          <div className="particles-container">
+            {particles.map((particle, index) => (
+              <Particle key={`particle-${particle}`} delay={index * 0.5} />
+            ))}
+            {coins.map((coin, index) => (
+              <CoinRain key={`coin-${coin}`} delay={index * 1.2} />
+            ))}
+          </div>
+
+          {/* Floating decorative elements */}
+          <div className="fixed top-20 left-10 text-crypto-pink/20 animate-float z-10">
+            <Sparkles size={32} />
+          </div>
+          <div className="fixed top-40 right-20 text-crypto-pink/20 animate-float-delayed z-10">
+            <Coins size={28} />
+          </div>
+          <div className="fixed bottom-32 left-20 text-crypto-pink/20 animate-float z-10">
+            <Cat size={24} />
+          </div>
+        </>
+      )}
       {/* Navigation Header */}
-      <nav className="crypto-gray border-b border-crypto-pink/20 sticky top-0 z-50 glass">
+      <nav className="crypto-gray border-b border-crypto-pink/20 sticky top-0 z-50 glass relative">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center h-16">
             {/* Logo */}
@@ -202,7 +281,7 @@ export default function Layout({ children }: LayoutProps) {
       {user && <JackpotBanner />}
 
       {/* Main Content */}
-      <main>{children}</main>
+      <main className="relative z-20">{children}</main>
     </div>
   );
 }

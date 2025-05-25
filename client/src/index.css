@@ -70,6 +70,11 @@
     @apply font-sans antialiased;
     background-color: hsl(var(--background)) !important;
     color: hsl(var(--foreground)) !important;
+    overflow-x: hidden;
+  }
+  
+  html {
+    overflow-x: hidden;
   }
 }
 

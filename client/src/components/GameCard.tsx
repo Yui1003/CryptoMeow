@@ -1,4 +1,3 @@
-
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Users } from "lucide-react";
@@ -38,17 +37,12 @@ export default function GameCard({
             <span className="text-sm">{players}</span>
           </div>
         </div>
-        
+
         <p className="text-gray-400 text-sm mb-4">{description}</p>
-        
+
         <div className="flex items-center justify-between">
-          <div className="text-sm">
-            <span className="text-gray-400">
-              {maxWin ? "Max Win:" : "Win Rate:"}
-            </span>
-            <span className="font-semibold ml-1 crypto-gold">
-              {maxWin || winRate}
-            </span>
+          <div className="text-sm text-gray-300">
+            Max Win: <span className="text-crypto-green font-semibold text-base">{maxWin}</span>
           </div>
           <Link href={gameUrl}>
             <Button className="gradient-pink hover:opacity-90 transition-opacity">
