@@ -12,13 +12,13 @@ import { generateServerSeed, generateClientSeed, calculateResult } from "@/lib/p
 import { Sparkles, RotateCcw } from "lucide-react";
 
 const SYMBOLS = [
-  { symbol: "🍒", value: "cherry", color: "text-red-500", multiplier: 2 },
-  { symbol: "🍋", value: "lemon", color: "text-yellow-500", multiplier: 3 },
-  { symbol: "🍊", value: "orange", color: "text-orange-500", multiplier: 4 },
-  { symbol: "🍇", value: "grape", color: "text-purple-500", multiplier: 5 },
-  { symbol: "🔔", value: "bell", color: "text-yellow-400", multiplier: 8 },
-  { symbol: "💎", value: "diamond", color: "text-blue-400", multiplier: 10 },
-  { symbol: "7️⃣", value: "seven", color: "text-red-600", multiplier: 20 },
+  { symbol: "🍒", value: "cherry", color: "text-red-500", multiplier: 1 },
+  { symbol: "🍋", value: "lemon", color: "text-yellow-500", multiplier: 1.5 },
+  { symbol: "🍊", value: "orange", color: "text-orange-500", multiplier: 2 },
+  { symbol: "🍇", value: "grape", color: "text-purple-500", multiplier: 2.5 },
+  { symbol: "🔔", value: "bell", color: "text-yellow-400", multiplier: 4 },
+  { symbol: "💎", value: "diamond", color: "text-blue-400", multiplier: 5 },
+  { symbol: "7️⃣", value: "seven", color: "text-red-600", multiplier: 10 },
 ];
 
 export default function Wheel() {
@@ -48,38 +48,75 @@ export default function Wheel() {
     },
   });
 
-  const getRandomSymbolIndex = (result: number, offset: number): number => {
-    const adjustedResult = (result + offset) % 1;
-    return Math.floor(adjustedResult * SYMBOLS.length);
+  const generateSymbolCombination = (result: number): number[] => {
+    // Use result to determine combination type
+    if (result < 0.15) {
+      // 15% chance for 3 of a kind
+      const symbolIndex = Math.floor(result * SYMBOLS.length / 0.15);
+      return [symbolIndex, symbolIndex, symbolIndex];
+    } else if (result < 0.45) {
+      // 30% chance for 2 of a kind
+      const symbolIndex = Math.floor((result - 0.15) * SYMBOLS.length / 0.3);
+      const otherIndex = Math.floor(((result - 0.15) * 7) % SYMBOLS.length);
+      // Ensure other symbol is different
+      const finalOtherIndex = otherIndex === symbolIndex ? (otherIndex + 1) % SYMBOLS.length : otherIndex;
+      
+      // Randomly place the pair
+      const positions = Math.floor((result - 0.15) * 3 / 0.3);
+      if (positions < 1) {
+        return [symbolIndex, symbolIndex, finalOtherIndex];
+      } else if (positions < 2) {
+        return [symbolIndex, finalOtherIndex, symbolIndex];
+      } else {
+        return [finalOtherIndex, symbolIndex, symbolIndex];
+      }
+    } else {
+      // 55% chance for no match (losing combination)
+      const seed1 = Math.floor(result * SYMBOLS.length);
+      const seed2 = Math.floor((result * 7) % SYMBOLS.length);
+      const seed3 = Math.floor((result * 13) % SYMBOLS.length);
+      
+      // Ensure all three are different
+      let symbol1 = seed1;
+      let symbol2 = seed2 === symbol1 ? (seed2 + 1) % SYMBOLS.length : seed2;
+      let symbol3 = seed3;
+      
+      // Make sure symbol3 is different from both symbol1 and symbol2
+      while (symbol3 === symbol1 || symbol3 === symbol2) {
+        symbol3 = (symbol3 + 1) % SYMBOLS.length;
+      }
+      
+      return [symbol1, symbol2, symbol3];
+    }
   };
 
-  const calculateWin = (symbolIndices: number[], result: number): { multiplier: number, isWin: boolean } => {
-    // 50% win chance - if result > 0.5, it's a win
-    const isWin = result > 0.5;
-    
-    if (!isWin) {
-      return { multiplier: 0, isWin: false };
-    }
-    
-    // Check for three of a kind (higher payout)
-    if (symbolIndices[0] === symbolIndices[1] && symbolIndices[1] === symbolIndices[2]) {
-      return { multiplier: SYMBOLS[symbolIndices[0]].multiplier, isWin: true };
-    }
-    
-    // Check for two of a kind (medium payout)
+  const calculateWin = (symbolIndices: number[]): { multiplier: number, isWin: boolean, winType: string } => {
+    // Count occurrences of each symbol
     const counts = symbolIndices.reduce((acc, index) => {
       acc[index] = (acc[index] || 0) + 1;
       return acc;
     }, {} as Record<number, number>);
     
+    // Check for three of a kind
     for (const [index, count] of Object.entries(counts)) {
-      if (count === 2) {
-        return { multiplier: SYMBOLS[parseInt(index)].multiplier * 0.5, isWin: true };
+      if (count === 3) {
+        const symbolIndex = parseInt(index);
+        const multiplier = SYMBOLS[symbolIndex].multiplier * 3; // 3x the base multiplier for 3 of a kind
+        return { multiplier, isWin: true, winType: "3 of a kind" };
       }
     }
     
-    // Any other combination when win = 1.8x (regular win)
-    return { multiplier: 1.8, isWin: true };
+    // Check for two of a kind
+    for (const [index, count] of Object.entries(counts)) {
+      if (count === 2) {
+        const symbolIndex = parseInt(index);
+        const multiplier = SYMBOLS[symbolIndex].multiplier * 2; // 2x the base multiplier for 2 of a kind
+        return { multiplier, isWin: true, winType: "2 of a kind" };
+      }
+    }
+    
+    // No winning combination
+    return { multiplier: 0, isWin: false, winType: "No match" };
   };
 
   const spinSlots = () => {
@@ -101,14 +138,10 @@ export default function Wheel() {
     
     const result = calculateResult(serverSeed, clientSeed, nonce);
     
-    // Generate three symbol indices
-    const symbolIndices = [
-      getRandomSymbolIndex(result, 0),
-      getRandomSymbolIndex(result, 0.33),
-      getRandomSymbolIndex(result, 0.66)
-    ];
+    // Generate symbol combination based on result
+    const symbolIndices = generateSymbolCombination(result);
     
-    const { multiplier, isWin } = calculateWin(symbolIndices, result);
+    const { multiplier, isWin, winType } = calculateWin(symbolIndices);
     
     // Animate the reels
     const animationDuration = 2000;
@@ -149,12 +182,12 @@ export default function Wheel() {
       if (isWin) {
         toast({
           title: "🎊 Winner!",
-          description: `You won ${winAmount.toFixed(2)} coins with ${multiplier}x multiplier!`,
+          description: `${winType}! You won ${winAmount.toFixed(2)} coins with ${multiplier}x multiplier!`,
         });
       } else {
         toast({
           title: "💥 No Win",
-          description: `Better luck next time!`,
+          description: `No matching symbols. Better luck next time!`,
           variant: "destructive",
         });
       }
@@ -169,7 +202,8 @@ export default function Wheel() {
         result: JSON.stringify({ 
           symbolIndices, 
           multiplier,
-          isWin
+          isWin,
+          winType
         }),
       });
       
@@ -252,15 +286,29 @@ export default function Wheel() {
                 <h3 className="text-lg font-semibold mb-4">Paytable</h3>
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-2 text-sm">
                   {SYMBOLS.map((symbol, index) => (
-                    <div key={index} className="flex items-center space-x-2 p-2 bg-gray-800 rounded">
+                    <div key={index} className="flex flex-col items-center space-y-1 p-2 bg-gray-800 rounded">
                       <span className={`text-lg ${symbol.color}`}>{symbol.symbol}</span>
-                      <span className="text-xs">3x = {symbol.multiplier}x</span>
+                      <div className="text-xs text-center">
+                        <div>2x = {(symbol.multiplier * 2).toFixed(1)}x</div>
+                        <div>3x = {(symbol.multiplier * 3).toFixed(1)}x</div>
+                      </div>
                     </div>
                   ))}
                 </div>
-                <p className="text-xs text-gray-400 mt-2">
-                  50% Win Chance • Regular win = 1.8x • 2 of a kind = 0.5x symbol multiplier • 3 of a kind = full symbol multiplier
-                </p>
+                
+                {/* Game Mechanics */}
+                <div className="mt-4 p-3 bg-gray-800/50 rounded-lg">
+                  <h4 className="text-sm font-semibold mb-2 text-crypto-pink">Game Mechanics</h4>
+                  <div className="text-xs text-gray-300 space-y-1">
+                    <p>• <span className="text-crypto-gold">3 of a Kind:</span> Get 3 matching symbols = 3x base multiplier</p>
+                    <p>• <span className="text-crypto-green">2 of a Kind:</span> Get 2 matching symbols = 2x base multiplier</p>
+                    <p>• <span className="text-red-400">No Match:</span> All different symbols = No win</p>
+                  </div>
+                </div>
+                
+                <div className="mt-2 text-xs text-gray-400">
+                  <p>Win Rates: 15% (3 of a kind) • 30% (2 of a kind) • 55% (No match)</p>
+                </div>
               </div>
               
               {/* Spin History */}
@@ -311,14 +359,14 @@ export default function Wheel() {
               <div>
                 <label className="block text-sm font-medium mb-2">Win Chance</label>
                 <div className="text-sm crypto-green">
-                  50%
+                  45% (15% + 30%)
                 </div>
               </div>
 
               <div>
                 <label className="block text-sm font-medium mb-2">Max Payout</label>
                 <div className="text-sm crypto-green">
-                  Up to {(selectedBet * 20).toFixed(2)} coins (20x)
+                  Up to {(selectedBet * 30).toFixed(2)} coins (30x)
                 </div>
               </div>
 
