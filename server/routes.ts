@@ -275,10 +275,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(400).json({ message: "Insufficient balance" });
       }
 
-      // Deduct amount from user balance
-      const newBalance = (parseFloat(user.balance) - amount).toFixed(2);
-      await storage.updateUserBalance(req.session.userId!, newBalance);
-
+      // Only create withdrawal request - don't deduct funds yet
       const withdrawal = await storage.createWithdrawal({
         ...withdrawalData,
         userId: req.session.userId!
@@ -291,6 +288,16 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  app.get("/api/withdrawals/user", requireAuth, async (req, res) => {
+    try {
+      const withdrawals = await storage.getUserWithdrawals(req.session.userId!);
+      res.json(withdrawals);
+    } catch (error) {
+      console.error("Get user withdrawals error:", error);
+      res.status(500).json({ message: "Failed to get withdrawal history" });
+    }
+  });
+
   app.get("/api/withdrawals", requireAdmin, async (req, res) => {
     try {
       const withdrawals = await storage.getWithdrawals();
@@ -298,6 +305,49 @@ export async function registerRoutes(app: Express): Promise<Server> {
     } catch (error) {
       console.error("Get withdrawals error:", error);
       res.status(500).json({ message: "Failed to get withdrawals" });
+    }
+  });
+
+  app.patch("/api/withdrawals/:id/status", requireAdmin, async (req, res) => {
+    try {
+      const { id } = req.params;
+      const { status } = req.body;
+      
+      if (!["approved", "rejected"].includes(status)) {
+        return res.status(400).json({ message: "Invalid status" });
+      }
+
+      const withdrawal = await storage.getWithdrawal(parseInt(id));
+      if (!withdrawal) {
+        return res.status(404).json({ message: "Withdrawal not found" });
+      }
+
+      if (withdrawal.status !== "pending") {
+        return res.status(400).json({ message: "Withdrawal already processed" });
+      }
+
+      if (status === "approved") {
+        // Deduct funds when approved
+        const user = await storage.getUser(withdrawal.userId);
+        if (!user) {
+          return res.status(404).json({ message: "User not found" });
+        }
+
+        const amount = parseFloat(withdrawal.amount);
+        if (parseFloat(user.balance) < amount) {
+          return res.status(400).json({ message: "User has insufficient balance" });
+        }
+
+        const newBalance = (parseFloat(user.balance) - amount).toFixed(2);
+        await storage.updateUserBalance(withdrawal.userId, newBalance);
+      }
+      // If rejected, no balance changes needed since funds were never deducted
+
+      await storage.updateWithdrawalStatus(parseInt(id), status);
+      res.json({ message: "Withdrawal status updated" });
+    } catch (error) {
+      console.error("Update withdrawal status error:", error);
+      res.status(500).json({ message: "Failed to update withdrawal status" });
     }
   });
 

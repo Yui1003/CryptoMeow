@@ -75,6 +75,20 @@ export default function Admin() {
     },
   });
 
+  const updateWithdrawalMutation = useMutation({
+    mutationFn: async ({ withdrawalId, status }: { withdrawalId: number; status: string }) => {
+      const response = await apiRequest("PATCH", `/api/withdrawals/${withdrawalId}/status`, { status });
+      return response.json();
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/withdrawals"] });
+      toast({
+        title: "Success",
+        description: "Withdrawal status updated successfully",
+      });
+    },
+  });
+
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
       <div className="flex items-center mb-8">
@@ -264,6 +278,7 @@ export default function Admin() {
                     <TableHead>Amount</TableHead>
                     <TableHead>Status</TableHead>
                     <TableHead>Date</TableHead>
+                    <TableHead>Actions</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
@@ -282,6 +297,35 @@ export default function Admin() {
                         </Badge>
                       </TableCell>
                       <TableCell>{new Date(withdrawal.createdAt).toLocaleDateString()}</TableCell>
+                      <TableCell>
+                        {withdrawal.status === "pending" && (
+                          <div className="space-x-2">
+                            <Button
+                              size="sm"
+                              onClick={() => updateWithdrawalMutation.mutate({
+                                withdrawalId: withdrawal.id,
+                                status: "approved"
+                              })}
+                              disabled={updateWithdrawalMutation.isPending}
+                            >
+                              <Check className="w-4 h-4 mr-1" />
+                              Approve
+                            </Button>
+                            <Button
+                              size="sm"
+                              variant="destructive"
+                              onClick={() => updateWithdrawalMutation.mutate({
+                                withdrawalId: withdrawal.id,
+                                status: "rejected"
+                              })}
+                              disabled={updateWithdrawalMutation.isPending}
+                            >
+                              <X className="w-4 h-4 mr-1" />
+                              Reject
+                            </Button>
+                          </div>
+                        )}
+                      </TableCell>
                     </TableRow>
                   ))}
                 </TableBody>

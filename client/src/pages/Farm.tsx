@@ -112,6 +112,34 @@ export default function Farm() {
     refetchInterval: 30000, // Refresh every 30 seconds
   });
 
+  const [unclaimedMeow, setUnclaimedMeow] = useState(0);
+  const [baseUnclaimedMeow, setBaseUnclaimedMeow] = useState(0);
+  const [lastUpdateTime, setLastUpdateTime] = useState(Date.now());
+
+  useEffect(() => {
+    if (farmData) {
+      setBaseUnclaimedMeow(parseFloat(farmData.unclaimedMeow || "0"));
+      setUnclaimedMeow(parseFloat(farmData.unclaimedMeow || "0"));
+      setLastUpdateTime(Date.now());
+    }
+  }, [farmData]);
+
+  useEffect(() => {
+    if (farmData && farmData.totalProduction > 0) {
+      const calculateUnclaimed = () => {
+        const currentTime = Date.now();
+        const timeElapsedSinceUpdate = (currentTime - lastUpdateTime) / 3600000; // in hours
+        const additionalEarnings = farmData.totalProduction * timeElapsedSinceUpdate;
+        const newUnclaimed = baseUnclaimedMeow + additionalEarnings;
+        setUnclaimedMeow(newUnclaimed);
+      };
+
+      const intervalId = setInterval(calculateUnclaimed, 1000); // Update every second
+
+      return () => clearInterval(intervalId); // Cleanup interval on unmount
+    }
+  }, [farmData, baseUnclaimedMeow, lastUpdateTime]);
+
   const buyCatMutation = useMutation({
     mutationFn: async (catId: string) => {
       console.log("Buying cat with ID:", catId);
@@ -244,9 +272,7 @@ export default function Farm() {
               <div>
                 <div className="text-sm text-gray-400">Unclaimed Rewards</div>
                 <div className="text-lg font-semibold crypto-green">
-                  {farmData
-                    ? parseFloat(farmData.unclaimedMeow || "0").toFixed(6)
-                    : "0.000000"}
+                  {unclaimedMeow.toFixed(6)}
                 </div>
               </div>
 
@@ -263,8 +289,7 @@ export default function Farm() {
                 onClick={() => claimMutation.mutate()}
                 disabled={
                   claimMutation.isPending ||
-                  !farmData?.unclaimedMeow ||
-                  parseFloat(farmData.unclaimedMeow) <= 0
+                  unclaimedMeow <= 0
                 }
                 className="w-full bg-crypto-green hover:bg-green-500 text-white hover:text-black font-semibold"
               >

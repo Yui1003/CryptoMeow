@@ -353,13 +353,6 @@ export default function Home() {
                     </div>
                   </Card>
                 </div>
-                  <GameCard 
-          title="Lucky 7s Slots"
-          description="Spin the slots with 50% win chance! Win big with symbol combinations!"
-          icon="🎰"
-          route="/games/wheel"
-          available={true}
-        />
               </div>
             </div>
 

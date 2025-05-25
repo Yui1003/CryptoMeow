@@ -14,7 +14,9 @@ export interface IStorage {
   updateDepositStatus(id: number, status: string): Promise<void>;
 
   createWithdrawal(withdrawal: InsertWithdrawal & { userId: number }): Promise<Withdrawal>;
+  getWithdrawal(id: number): Promise<Withdrawal | undefined>;
   getWithdrawals(): Promise<Withdrawal[]>;
+  getUserWithdrawals(userId: number): Promise<Withdrawal[]>;
   updateWithdrawalStatus(id: number, status: string): Promise<void>;
 
   createGameHistory(game: InsertGameHistory & { userId: number }): Promise<GameHistory>;
@@ -171,8 +173,18 @@ export class MemStorage implements IStorage {
     return newWithdrawal;
   }
 
+  async getWithdrawal(id: number): Promise<Withdrawal | undefined> {
+    return this.withdrawals.get(id);
+  }
+
   async getWithdrawals(): Promise<Withdrawal[]> {
     return Array.from(this.withdrawals.values()).sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime());
+  }
+
+  async getUserWithdrawals(userId: number): Promise<Withdrawal[]> {
+    return Array.from(this.withdrawals.values())
+      .filter(withdrawal => withdrawal.userId === userId)
+      .sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime());
   }
 
   async updateWithdrawalStatus(id: number, status: string): Promise<void> {

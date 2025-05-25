@@ -227,8 +227,18 @@ export class FileStorage {
     return newWithdrawal;
   }
 
+  async getWithdrawal(id: number): Promise<Withdrawal | undefined> {
+    return this.data.withdrawals.find(w => w.id === id);
+  }
+
   async getWithdrawals(): Promise<Withdrawal[]> {
     return this.data.withdrawals.sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime());
+  }
+
+  async getUserWithdrawals(userId: number): Promise<Withdrawal[]> {
+    return this.data.withdrawals
+      .filter(withdrawal => withdrawal.userId === userId)
+      .sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime());
   }
 
   async updateWithdrawalStatus(id: number, status: string): Promise<void> {

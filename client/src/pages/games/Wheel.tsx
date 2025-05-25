@@ -50,19 +50,19 @@ export default function Wheel() {
 
   const generateSymbolCombination = (result: number): number[] => {
     // Use result to determine combination type
-    if (result < 0.15) {
-      // 15% chance for 3 of a kind
-      const symbolIndex = Math.floor(result * SYMBOLS.length / 0.15);
+    if (result < 0.08) {
+      // 8% chance for 3 of a kind
+      const symbolIndex = Math.floor(result * SYMBOLS.length / 0.08);
       return [symbolIndex, symbolIndex, symbolIndex];
-    } else if (result < 0.45) {
-      // 30% chance for 2 of a kind
-      const symbolIndex = Math.floor((result - 0.15) * SYMBOLS.length / 0.3);
-      const otherIndex = Math.floor(((result - 0.15) * 7) % SYMBOLS.length);
+    } else if (result < 0.25) {
+      // 17% chance for 2 of a kind
+      const symbolIndex = Math.floor((result - 0.08) * SYMBOLS.length / 0.17);
+      const otherIndex = Math.floor(((result - 0.08) * 7) % SYMBOLS.length);
       // Ensure other symbol is different
       const finalOtherIndex = otherIndex === symbolIndex ? (otherIndex + 1) % SYMBOLS.length : otherIndex;
       
       // Randomly place the pair
-      const positions = Math.floor((result - 0.15) * 3 / 0.3);
+      const positions = Math.floor((result - 0.08) * 3 / 0.17);
       if (positions < 1) {
         return [symbolIndex, symbolIndex, finalOtherIndex];
       } else if (positions < 2) {
@@ -71,7 +71,7 @@ export default function Wheel() {
         return [finalOtherIndex, symbolIndex, symbolIndex];
       }
     } else {
-      // 55% chance for no match (losing combination)
+      // 75% chance for no match (losing combination)
       const seed1 = Math.floor(result * SYMBOLS.length);
       const seed2 = Math.floor((result * 7) % SYMBOLS.length);
       const seed3 = Math.floor((result * 13) % SYMBOLS.length);
@@ -307,7 +307,7 @@ export default function Wheel() {
                 </div>
                 
                 <div className="mt-2 text-xs text-gray-400">
-                  <p>Win Rates: 15% (3 of a kind) • 30% (2 of a kind) • 55% (No match)</p>
+                  <p>Win Rates: 8% (3 of a kind) • 17% (2 of a kind) • 75% (No match)</p>
                 </div>
               </div>
               
@@ -359,7 +359,7 @@ export default function Wheel() {
               <div>
                 <label className="block text-sm font-medium mb-2">Win Chance</label>
                 <div className="text-sm crypto-green">
-                  45% (15% + 30%)
+                  25% (8% + 17%)
                 </div>
               </div>
 

@@ -188,15 +188,15 @@ export default function Withdraw() {
             </div>
 
             <div>
-              <h3 className="font-semibold crypto-pink mb-2">Withdrawal Process:</h3>
-              <ol className="list-decimal list-inside space-y-2 text-sm text-gray-300">
-                <li>Submit your withdrawal request</li>
-                <li>Your account balance will be immediately deducted</li>
-                <li>Admin will review and process your request</li>
-                <li>Funds will be transferred to your registered account</li>
-                <li>You'll receive confirmation once completed</li>
-              </ol>
-            </div>
+                <h3 className="font-semibold crypto-pink mb-2">Withdrawal Process:</h3>
+                <ol className="list-decimal list-inside space-y-2 text-sm text-gray-300">
+                  <li>Submit your withdrawal request</li>
+                  <li>Admin will review and approve your request</li>
+                  <li>Your account balance will be deducted upon approval</li>
+                  <li>Funds will be transferred to your registered account</li>
+                  <li>You'll receive confirmation once completed</li>
+                </ol>
+              </div>
 
             <div className="border-t border-crypto-pink/20 pt-4">
               <h3 className="font-semibold crypto-pink mb-2">Withdrawal Limits:</h3>
