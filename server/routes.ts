@@ -1,4 +1,4 @@
-import type { Express } from "express";
+import express, { type Express } from "express";
 import { createServer, type Server } from "http";
 import { storage } from "./storage";
 import bcrypt from "bcrypt";
@@ -46,13 +46,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Serve uploaded files
-  app.use('/uploads', (req, res, next) => {
-    // Add basic auth check for receipt access
-    if (!req.session.userId) {
-      return res.status(401).json({ message: "Authentication required" });
-    }
-    next();
-  }, require('express').static(uploadsDir));
+  app.use('/uploads', express.static(uploadsDir));
 
   // Session middleware
   app.use(session({
