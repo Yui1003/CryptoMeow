@@ -1,4 +1,4 @@
-import { users, deposits, withdrawals, gameHistory, jackpot, type User, type InsertUser, type Deposit, type InsertDeposit, type Withdrawal, type InsertWithdrawal, type GameHistory, type InsertGameHistory, type Jackpot } from "@shared/schema";
+import { users, deposits, withdrawals, gameHistory, jackpot, farmCats, type User, type InsertUser, type Deposit, type InsertDeposit, type Withdrawal, type InsertWithdrawal, type GameHistory, type InsertGameHistory, type Jackpot } from "@shared/schema";
 import { FileStorage } from "./fileStorage";
 import bcrypt from "bcrypt";
 
@@ -7,23 +7,29 @@ export interface IStorage {
   getUserByUsername(username: string): Promise<User | undefined>;
   createUser(user: InsertUser): Promise<User>;
   updateUserBalance(userId: number, balance: string, meowBalance?: string): Promise<void>;
-  
+
   createDeposit(deposit: InsertDeposit & { userId: number }): Promise<Deposit>;
   getDeposits(): Promise<Deposit[]>;
   updateDepositStatus(id: number, status: string): Promise<void>;
-  
+
   createWithdrawal(withdrawal: InsertWithdrawal & { userId: number }): Promise<Withdrawal>;
   getWithdrawals(): Promise<Withdrawal[]>;
   updateWithdrawalStatus(id: number, status: string): Promise<void>;
-  
+
   createGameHistory(game: InsertGameHistory & { userId: number }): Promise<GameHistory>;
   getGameHistory(userId?: number): Promise<GameHistory[]>;
-  
+
   getJackpot(): Promise<Jackpot>;
   updateJackpot(amount: string, winnerId?: number): Promise<void>;
-  
+
   getAllUsers(): Promise<User[]>;
   banUser(userId: number, banned: boolean): Promise<void>;
+
+  getFarmData(userId: number): Promise<any>;
+  createFarmCat(data: { userId: number; catId: string; production: number }): Promise<any>;
+  getFarmCat(id: number): Promise<any>;
+  upgradeFarmCat(id: number, level: number, production: number): Promise<void>;
+  claimFarmRewards(userId: number): Promise<void>;
 }
 
 export class MemStorage implements IStorage {
@@ -46,7 +52,7 @@ export class MemStorage implements IStorage {
     this.currentDepositId = 1;
     this.currentWithdrawalId = 1;
     this.currentGameHistoryId = 1;
-    
+
     // Initialize jackpot
     this.jackpotData = {
       id: 1,
@@ -55,7 +61,7 @@ export class MemStorage implements IStorage {
       lastWonAt: null,
       updatedAt: new Date(),
     };
-    
+
     // Create admin user
     this.initializeAdminUser();
   }
@@ -135,7 +141,7 @@ export class MemStorage implements IStorage {
     if (deposit) {
       deposit.status = status;
       this.deposits.set(id, deposit);
-      
+
       // If approved, update user balance
       if (status === "approved") {
         const user = this.users.get(deposit.userId);
@@ -182,7 +188,7 @@ export class MemStorage implements IStorage {
       createdAt: new Date(),
     };
     this.gameHistoryEntries.set(id, newGame);
-    
+
     // Update jackpot based on losses
     if (parseFloat(game.winAmount || "0") === 0) {
       const currentJackpot = parseFloat(this.jackpotData.amount);
@@ -191,7 +197,7 @@ export class MemStorage implements IStorage {
       this.jackpotData.amount = (currentJackpot + jackpotIncrease).toFixed(8);
       this.jackpotData.updatedAt = new Date();
     }
-    
+
     return newGame;
   }
 
@@ -226,6 +232,30 @@ export class MemStorage implements IStorage {
       user.isBanned = banned;
       this.users.set(userId, user);
     }
+  }
+
+  async getFarmData(userId: number): Promise<any> {
+    return {
+      cats: [],
+      totalProduction: 0,
+      unclaimedMeow: "0.00000000"
+    };
+  }
+
+  async createFarmCat(data: { userId: number; catId: string; production: number }): Promise<any> {
+    return null;
+  }
+
+  async getFarmCat(id: number): Promise<any> {
+    return null;
+  }
+
+  async upgradeFarmCat(id: number, level: number, production: number): Promise<void> {
+    // Placeholder implementation
+  }
+
+  async claimFarmRewards(userId: number): Promise<void> {
+    // Placeholder implementation
   }
 }
 

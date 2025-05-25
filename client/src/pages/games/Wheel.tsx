@@ -85,7 +85,7 @@ export default function Wheel() {
     
     const serverSeed = generateServerSeed();
     const clientSeed = generateClientSeed();
-    const nonce = Math.floor(Math.random() * 1000000);
+    const nonce = Date.now();
     
     const result = calculateResult(serverSeed, clientSeed, nonce);
     const segments = RISK_LEVELS[riskLevel];
@@ -195,6 +195,8 @@ export default function Wheel() {
                       const segmentAngle = 360 / segments.length;
                       const rotation = index * segmentAngle;
                       const isWinning = winningSegment === index;
+                      const startAngle = (rotation - segmentAngle/2) * Math.PI / 180;
+                      const endAngle = (rotation + segmentAngle/2) * Math.PI / 180;
                       
                       return (
                         <div
@@ -203,21 +205,21 @@ export default function Wheel() {
                             isWinning ? 'ring-4 ring-crypto-gold' : ''
                           }`}
                           style={{
-                            clipPath: `polygon(50% 50%, ${
-                              50 + 50 * Math.cos((rotation - segmentAngle/2) * Math.PI / 180)
-                            }% ${
-                              50 + 50 * Math.sin((rotation - segmentAngle/2) * Math.PI / 180)
-                            }%, ${
-                              50 + 50 * Math.cos((rotation + segmentAngle/2) * Math.PI / 180)
-                            }% ${
-                              50 + 50 * Math.sin((rotation + segmentAngle/2) * Math.PI / 180)
-                            }%)`,
+                            clipPath: `path('M 160,160 L ${
+                              160 + 160 * Math.cos(startAngle)
+                            },${
+                              160 + 160 * Math.sin(startAngle)
+                            } A 160,160 0 0,1 ${
+                              160 + 160 * Math.cos(endAngle)
+                            },${
+                              160 + 160 * Math.sin(endAngle)
+                            } Z')`
                           }}
                         >
                           <div 
-                            className="absolute inset-0 flex items-center justify-center text-white font-bold text-lg"
+                            className="absolute inset-0 flex items-center justify-center text-white font-bold text-2xl"
                             style={{
-                              transform: `rotate(${rotation}deg) translateY(-60px)`,
+                              transform: `rotate(${rotation}deg) translateY(-100px)`,
                               transformOrigin: '50% 160px'
                             }}
                           >

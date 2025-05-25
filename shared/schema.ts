@@ -53,6 +53,16 @@ export const jackpot = mysqlTable("jackpot", {
   updatedAt: timestamp("updated_at").notNull().defaultNow(),
 });
 
+export const farmCats = mysqlTable("farm_cats", {
+  id: int("id").primaryKey().autoincrement(),
+  userId: int("user_id").notNull(),
+  catId: text("cat_id").notNull(), // References cat type
+  level: int("level").notNull().default(1),
+  production: decimal("production", { precision: 12, scale: 8 }).notNull(),
+  lastClaim: timestamp("last_claim").notNull().defaultNow(),
+  createdAt: timestamp("created_at").notNull().defaultNow(),
+});
+
 export const insertUserSchema = createInsertSchema(users).pick({
   username: true,
   password: true,
@@ -87,3 +97,4 @@ export type Withdrawal = typeof withdrawals.$inferSelect;
 export type InsertGameHistory = z.infer<typeof insertGameHistorySchema>;
 export type GameHistory = typeof gameHistory.$inferSelect;
 export type Jackpot = typeof jackpot.$inferSelect;
+export type FarmCat = typeof farmCats.$inferSelect;

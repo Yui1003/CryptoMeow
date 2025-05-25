@@ -69,7 +69,7 @@ export default function Layout({ children }: LayoutProps) {
                 CryptoMeow
               </h1>
             </Link>
-            
+
             {user && (
               <>
                 {/* User Balance & Controls */}
@@ -90,7 +90,7 @@ export default function Layout({ children }: LayoutProps) {
                       </div>
                     </div>
                   </div>
-                  
+
                   {/* User Menu */}
                   <DropdownMenu>
                     <DropdownMenuTrigger asChild>

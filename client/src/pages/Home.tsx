@@ -13,7 +13,8 @@ import {
   Upload, 
   Download,
   ArrowUpDown,
-  Shield
+  Shield,
+  Cat
 } from "lucide-react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { apiRequest } from "@/lib/queryClient";
@@ -99,6 +100,12 @@ export default function Home() {
                   <Link href="/withdraw">
                     <Download className="w-4 h-4 mr-2" />
                     Withdraw
+                  </Link>
+                </Button>
+                <Button asChild variant="outline" className="w-full crypto-black hover:bg-crypto-gray border-crypto-pink/30">
+                  <Link href="/farm">
+                    <Cat className="w-4 h-4 mr-2" />
+                    Cat Farm
                   </Link>
                 </Button>
               </div>

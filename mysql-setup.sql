@@ -48,6 +48,28 @@ CREATE TABLE game_history (
     FOREIGN KEY (user_id) REFERENCES users(id)
 );
 
+-- Farm cats table
+CREATE TABLE farm_cats (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    user_id INT NOT NULL,
+    cat_id VARCHAR(50) NOT NULL,
+    level INT DEFAULT 1,
+    production DECIMAL(15,8) NOT NULL,
+    last_claim TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (user_id) REFERENCES users(id)
+);
+
+-- Jackpot table
+CREATE TABLE jackpot (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    amount DECIMAL(15,8) DEFAULT 0.10000000,
+    last_winner_id INT,
+    last_won_at TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (last_winner_id) REFERENCES users(id)
+);
+
 -- Jackpot table
 CREATE TABLE jackpot (
     id INT AUTO_INCREMENT PRIMARY KEY,

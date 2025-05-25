@@ -10,7 +10,8 @@ import Register from "@/pages/Register";
 import Admin from "@/pages/Admin";
 import Wallet from "@/pages/Wallet";
 import Deposit from "@/pages/Deposit";
-import Withdraw from "@/pages/Withdraw";
+import Withdraw from "./pages/Withdraw";
+import Farm from "./pages/Farm";
 import Mines from "@/pages/games/Mines";
 import Crash from "@/pages/games/Crash";
 import Wheel from "@/pages/games/Wheel";
@@ -29,6 +30,7 @@ function Router() {
       <Route path="/wallet" component={Wallet} />
       <Route path="/deposit" component={Deposit} />
       <Route path="/withdraw" component={Withdraw} />
+      <Route path="/farm" component={Farm} />
       <Route path="/games/mines" component={Mines} />
       <Route path="/games/crash" component={Crash} />
       <Route path="/games/wheel" component={Wheel} />

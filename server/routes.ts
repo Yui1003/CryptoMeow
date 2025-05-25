@@ -353,6 +353,128 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Farm routes
+  app.get("/api/farm/data", requireAuth, async (req, res) => {
+    try {
+      const farmData = await storage.getFarmData(req.session.userId!);
+      res.json(farmData);
+    } catch (error) {
+      console.error("Get farm data error:", error);
+      res.status(500).json({ message: "Failed to get farm data" });
+    }
+  });
+
+  app.post("/api/farm/buy-cat", requireAuth, async (req, res) => {
+    try {
+      const { catId } = req.body;
+      
+      const CAT_TYPES: Record<string, any> = {
+        "basic": { baseProduction: 0.001, cost: 0.1 },
+        "farm": { baseProduction: 0.002, cost: 0.25 },
+        "business": { baseProduction: 0.005, cost: 0.75 },
+        "ninja": { baseProduction: 0.008, cost: 1.5 },
+        "cyber": { baseProduction: 0.015, cost: 3.0 },
+        "golden": { baseProduction: 0.05, cost: 10.0 }
+      };
+
+      const catType = CAT_TYPES[catId];
+      if (!catType) {
+        return res.status(400).json({ message: "Invalid cat type" });
+      }
+
+      const user = await storage.getUser(req.session.userId!);
+      if (!user) {
+        return res.status(404).json({ message: "User not found" });
+      }
+
+      const userMeow = parseFloat(user.meowBalance);
+      if (userMeow < catType.cost) {
+        return res.status(400).json({ message: "Insufficient $MEOW balance" });
+      }
+
+      // Deduct cost and buy cat
+      const newMeowBalance = (userMeow - catType.cost).toFixed(8);
+      await storage.updateUserBalance(req.session.userId!, user.balance, newMeowBalance);
+      
+      const farmCat = await storage.createFarmCat({
+        userId: req.session.userId!,
+        catId,
+        production: catType.baseProduction
+      });
+
+      res.json(farmCat);
+    } catch (error) {
+      console.error("Buy cat error:", error);
+      res.status(500).json({ message: "Failed to buy cat" });
+    }
+  });
+
+  app.post("/api/farm/upgrade-cat", requireAuth, async (req, res) => {
+    try {
+      const { farmCatId } = req.body;
+      
+      const farmCat = await storage.getFarmCat(parseInt(farmCatId));
+      if (!farmCat || farmCat.userId !== req.session.userId!) {
+        return res.status(404).json({ message: "Cat not found" });
+      }
+
+      const upgradeCost = 0.1 * Math.pow(1.5, farmCat.level);
+      
+      const user = await storage.getUser(req.session.userId!);
+      if (!user) {
+        return res.status(404).json({ message: "User not found" });
+      }
+
+      const userMeow = parseFloat(user.meowBalance);
+      if (userMeow < upgradeCost) {
+        return res.status(400).json({ message: "Insufficient $MEOW balance" });
+      }
+
+      // Deduct cost and upgrade cat
+      const newMeowBalance = (userMeow - upgradeCost).toFixed(8);
+      await storage.updateUserBalance(req.session.userId!, user.balance, newMeowBalance);
+      
+      const newLevel = farmCat.level + 1;
+      const newProduction = parseFloat(farmCat.production) * 1.2; // 20% increase per level
+      
+      await storage.upgradeFarmCat(parseInt(farmCatId), newLevel, newProduction);
+
+      res.json({ message: "Cat upgraded successfully" });
+    } catch (error) {
+      console.error("Upgrade cat error:", error);
+      res.status(500).json({ message: "Failed to upgrade cat" });
+    }
+  });
+
+  app.post("/api/farm/claim", requireAuth, async (req, res) => {
+    try {
+      const farmData = await storage.getFarmData(req.session.userId!);
+      
+      if (!farmData.unclaimedMeow || parseFloat(farmData.unclaimedMeow) <= 0) {
+        return res.status(400).json({ message: "No rewards to claim" });
+      }
+
+      const user = await storage.getUser(req.session.userId!);
+      if (!user) {
+        return res.status(404).json({ message: "User not found" });
+      }
+
+      const newMeowBalance = (parseFloat(user.meowBalance) + parseFloat(farmData.unclaimedMeow)).toFixed(8);
+      await storage.updateUserBalance(req.session.userId!, user.balance, newMeowBalance);
+      
+      // Update claim timestamps
+      await storage.claimFarmRewards(req.session.userId!);
+
+      res.json({ 
+        claimed: farmData.unclaimedMeow,
+        newBalance: newMeowBalance 
+      });
+    } catch (error) {
+      console.error("Claim rewards error:", error);
+      res.status(500).json({ message: "Failed to claim rewards" });
+    }
+  });
+
   app.get("/api/admin/game-history", requireAdmin, async (req, res) => {
     try {
       const history = await storage.getGameHistory();
