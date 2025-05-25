@@ -353,6 +353,30 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  app.post("/api/admin/add-meow", requireAdmin, async (req, res) => {
+    try {
+      const { userId, amount } = req.body;
+      
+      const user = await storage.getUser(userId || req.session.userId!);
+      if (!user) {
+        return res.status(404).json({ message: "User not found" });
+      }
+
+      const currentMeow = parseFloat(user.meowBalance);
+      const newMeowBalance = (currentMeow + parseFloat(amount)).toFixed(8);
+      
+      await storage.updateUserBalance(userId || req.session.userId!, user.balance, newMeowBalance);
+      
+      res.json({ 
+        message: "MEOW balance updated", 
+        newBalance: newMeowBalance 
+      });
+    } catch (error) {
+      console.error("Add MEOW error:", error);
+      res.status(500).json({ message: "Failed to add MEOW" });
+    }
+  });
+
   // Farm routes
   app.get("/api/farm/data", requireAuth, async (req, res) => {
     try {

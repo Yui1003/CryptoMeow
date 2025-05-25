@@ -14,8 +14,8 @@
       "id": 1,
       "username": "admin",
       "password": "$2b$10$yiQUwI1/UJh4Y01jeDNBBOSO5rNsMOnsMpHRB7BCJhLY8El7J.oUi",
-      "balance": "10000.00",
-      "meowBalance": "0.50000000",
+      "balance": "10001.25",
+      "meowBalance": "39.90000000",
       "isAdmin": true,
       "isBanned": false,
       "createdAt": "2025-05-24T19:43:45.385Z"
@@ -718,17 +718,64 @@
       "userId": 2,
       "id": 1,
       "createdAt": "2025-05-24T19:44:29.073Z"
+    },
+    {
+      "gameType": "mines",
+      "betAmount": "1",
+      "winAmount": "0",
+      "serverSeed": "x0wnajlvpdce4tlrcu4ib4",
+      "clientSeed": "s87hvj1uk6l",
+      "nonce": 9,
+      "result": "{\"tileId\":8,\"isMine\":true,\"revealedCount\":0}",
+      "meowWon": "0.00000000",
+      "userId": 1,
+      "id": 53,
+      "createdAt": "2025-05-25T16:12:51.466Z"
+    },
+    {
+      "gameType": "mines",
+      "betAmount": "1",
+      "winAmount": "3.25",
+      "serverSeed": "nkeqcpgp0agi88ftmfw33",
+      "clientSeed": "zhi8xsmo1rb",
+      "nonce": 6,
+      "result": "{\"revealedCount\":5,\"multiplier\":3.25,\"cashedOut\":true}",
+      "meowWon": "0.00000000",
+      "userId": 1,
+      "id": 54,
+      "createdAt": "2025-05-25T16:12:59.811Z"
     }
   ],
   "jackpot": {
     "id": 1,
-    "amount": "1.25000000",
+    "amount": "1.26000000",
     "lastWinnerId": 2,
     "lastWonAt": "2025-05-24T20:11:37.409Z",
-    "updatedAt": "2025-05-25T06:41:56.076Z"
+    "updatedAt": "2025-05-25T16:12:51.466Z"
   },
   "currentUserId": 3,
   "currentDepositId": 3,
   "currentWithdrawalId": 1,
-  "currentGameHistoryId": 53
+  "currentGameHistoryId": 55,
+  "farmCats": [
+    {
+      "id": 1,
+      "userId": 1,
+      "catId": "basic",
+      "level": 1,
+      "production": 0.001,
+      "lastClaim": "2025-05-25T15:39:18.713Z",
+      "createdAt": "2025-05-25T15:39:18.713Z"
+    },
+    {
+      "id": 2,
+      "userId": 1,
+      "catId": "golden",
+      "level": 1,
+      "production": 0.05,
+      "lastClaim": "2025-05-25T15:39:40.311Z",
+      "createdAt": "2025-05-25T15:39:40.311Z"
+    }
+  ],
+  "currentFarmCatId": 3
 }

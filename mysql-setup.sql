@@ -49,7 +49,7 @@ CREATE TABLE game_history (
 );
 
 -- Farm cats table
-CREATE TABLE farm_cats (
+CREATE TABLE IF NOT EXISTS farm_cats (
     id INT AUTO_INCREMENT PRIMARY KEY,
     user_id INT NOT NULL,
     cat_id VARCHAR(50) NOT NULL,
@@ -81,7 +81,8 @@ CREATE TABLE jackpot (
 
 -- Insert admin user (password: admin1234)
 INSERT INTO users (username, password, balance, meow_balance, is_admin) 
-VALUES ('admin', '$2b$10$rGJ3gI7YcUKOHJKmOQwjXuq8c1ZhQjWgO9XKpP8jY9MNdQ7Zs3QXS', 10000.00000000, 1.00000000, TRUE);
+VALUES ('admin', '$2b$10$rGJ3gI7YcUKOHJKmOQwjXuq8c1ZhQjWgO9XKpP8jY9MNdQ7Zs3QXS', 10000.00, 100.00000000, TRUE)
+ON DUPLICATE KEY UPDATE meow_balance = 100.00000000;
 
 -- Insert initial jackpot
 INSERT INTO jackpot (amount) VALUES (0.10000000);

@@ -4,35 +4,61 @@
 
 :root {
   /* True Black-Pink Theme */
-  --background: 0 0% 6%; /* Pure black background */
-  --foreground: 330 100% 85%; /* Bright pink text */
-  --muted: 0 0% 12%; /* Dark gray */
-  --muted-foreground: 330 50% 70%; /* Muted pink */
-  --popover: 0 0% 8%; /* Dark popover */
-  --popover-foreground: 330 100% 85%; /* Pink text */
-  --card: 0 0% 8%; /* Dark cards */
-  --card-foreground: 330 100% 85%; /* Pink text */
-  --border: 330 100% 70%; /* Pink borders */
-  --input: 0 0% 12%; /* Dark inputs */
-  --primary: 330 100% 70%; /* Bright pink primary */
-  --primary-foreground: 0 0% 6%; /* Black text on pink */
-  --secondary: 0 0% 12%; /* Dark secondary */
-  --secondary-foreground: 330 100% 85%; /* Pink text */
-  --accent: 330 100% 80%; /* Light pink accent */
-  --accent-foreground: 0 0% 6%; /* Black text */
-  --destructive: 0 84% 60%; /* Red */
-  --destructive-foreground: 0 0% 100%; /* White text */
-  --ring: 330 100% 70%; /* Pink ring */
+  --background: 0 0% 6%;
+  /* Pure black background */
+  --foreground: 330 100% 85%;
+  /* Bright pink text */
+  --muted: 0 0% 12%;
+  /* Dark gray */
+  --muted-foreground: 330 50% 70%;
+  /* Muted pink */
+  --popover: 0 0% 8%;
+  /* Dark popover */
+  --popover-foreground: 330 100% 85%;
+  /* Pink text */
+  --card: 0 0% 8%;
+  /* Dark cards */
+  --card-foreground: 330 100% 85%;
+  /* Pink text */
+  --border: 330 100% 70%;
+  /* Pink borders */
+  --input: 0 0% 12%;
+  /* Dark inputs */
+  --primary: 330 100% 70%;
+  /* Bright pink primary */
+  --primary-foreground: 0 0% 6%;
+  /* Black text on pink */
+  --secondary: 0 0% 12%;
+  /* Dark secondary */
+  --secondary-foreground: 330 100% 85%;
+  /* Pink text */
+  --accent: 330 100% 80%;
+  /* Light pink accent */
+  --accent-foreground: 0 0% 6%;
+  /* Black text */
+  --destructive: 0 84% 60%;
+  /* Red */
+  --destructive-foreground: 0 0% 100%;
+  /* White text */
+  --ring: 330 100% 70%;
+  /* Pink ring */
   --radius: 0.5rem;
-  
+
   /* Custom crypto colors - TRUE BLACK AND PINK */
-  --crypto-black: 0 0% 6%; /* #0f0f0f - Pure black */
-  --crypto-gray: 0 0% 12%; /* #1f1f1f - Dark gray */
-  --crypto-pink: 330 100% 70%; /* #ff1493 - Hot pink */
-  --crypto-pink-light: 330 100% 80%; /* #ff69b4 - Light pink */
-  --crypto-green: 120 100% 50%; /* #00ff00 - Bright green */
-  --crypto-gold: 255 170 0; /* Removed - using pink instead */
-  --crypto-red: 0 84% 60%; /* #ff4444 - Red */
+  --crypto-black: 0 0% 6%;
+  /* #0f0f0f - Pure black */
+  --crypto-gray: 0 0% 12%;
+  /* #1f1f1f - Dark gray */
+  --crypto-pink: 330 100% 70%;
+  /* #ff1493 - Hot pink */
+  --crypto-pink-light: 330 100% 80%;
+  /* #ff69b4 - Light pink */
+  --crypto-green: 120 100% 50%;
+  /* #00ff00 - Bright green */
+  --crypto-gold: 255 170 0;
+  /* Removed - using pink instead */
+  --crypto-red: 0 84% 60%;
+  /* #ff4444 - Red */
 }
 
 @layer base {
@@ -51,88 +77,88 @@
   .gradient-pink {
     background: linear-gradient(135deg, hsl(var(--crypto-pink)) 0%, hsl(var(--crypto-pink-light)) 100%);
   }
-  
+
   .gradient-gold {
     background: linear-gradient(135deg, hsl(var(--crypto-gold)) 0%, #ffd700 100%);
   }
-  
+
   .glow-pink {
     box-shadow: 0 0 20px hsla(var(--crypto-pink), 0.3);
   }
-  
+
   .glow-green {
     box-shadow: 0 0 20px hsla(var(--crypto-green), 0.3);
   }
-  
+
   .text-glow {
     text-shadow: 0 0 10px currentColor;
   }
-  
+
   .glass {
     backdrop-filter: blur(10px);
     background: hsla(var(--crypto-gray), 0.8);
   }
-  
+
   .game-card {
     transition: transform 0.3s ease;
   }
-  
+
   .game-card:hover {
     transform: translateY(-4px);
   }
-  
+
   .crypto-black {
     background-color: hsl(var(--crypto-black));
   }
-  
+
   .crypto-gray {
     background-color: hsl(var(--crypto-gray));
   }
-  
+
   .crypto-pink {
     background-color: hsl(var(--crypto-pink));
   }
-  
+
   .crypto-pink-light {
     background-color: hsl(var(--crypto-pink-light));
   }
-  
+
   .crypto-green {
     color: hsl(var(--crypto-green));
   }
-  
+
   .crypto-gold {
     color: hsl(var(--crypto-gold));
   }
-  
+
   .crypto-red {
     color: hsl(var(--crypto-red));
   }
-  
+
   .text-crypto-pink {
     color: hsl(var(--crypto-pink));
   }
-  
+
   .text-crypto-green {
     color: hsl(var(--crypto-green));
   }
-  
+
   .text-crypto-gold {
     color: hsl(var(--crypto-gold));
   }
-  
+
   .text-crypto-red {
     color: hsl(var(--crypto-red));
   }
-  
+
   .border-crypto-pink {
     border-color: hsl(var(--crypto-pink));
   }
-  
+
   .hover\:bg-crypto-pink:hover {
     background-color: hsl(var(--crypto-pink));
   }
-  
+
   .hover\:bg-crypto-pink-light:hover {
     background-color: hsl(var(--crypto-pink-light));
   }
@@ -142,30 +168,223 @@
   .animate-pulse-slow {
     animation: pulse 3s ease-in-out infinite;
   }
-  
+
   .animate-glow {
     animation: glow 2s ease-in-out infinite alternate;
   }
-  
+
   .animate-jackpot {
     animation: jackpot 1s ease-in-out infinite;
   }
-  
+
+  .animate-float {
+    animation: float 6s ease-in-out infinite;
+  }
+
+  .animate-float-delayed {
+    animation: float 6s ease-in-out infinite;
+    animation-delay: 2s;
+  }
+
+  .animate-slide-in {
+    animation: slideIn 1s ease-out;
+  }
+
+  .animate-fade-in {
+    animation: fadeIn 1.5s ease-out;
+  }
+
+  .animate-background-shift {
+    animation: backgroundShift 10s ease-in-out infinite;
+  }
+
+  .animate-twinkle {
+    animation: sparkle 3s ease-in-out infinite;
+  }
+
+  .animate-pulse-fast {
+    animation: pulse 1s ease-in-out infinite;
+  }
+
+  .animate-bounce-slow {
+    animation: bounce 2s ease-in-out infinite;
+  }
+
+  .hover-scale {
+    transition: transform 0.3s ease;
+  }
+
+  .hover-scale:hover {
+    transform: scale(1.05);
+  }
+
+  .background-animated {
+    background: linear-gradient(-45deg, hsl(var(--crypto-black)), hsl(var(--crypto-gray)), hsl(var(--crypto-black)), rgba(255, 20, 147, 0.1));
+    background-size: 400% 400%;
+    animation: gradientFlow 15s ease infinite;
+  }
+
+  .particles-container {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    z-index: 1;
+  }
+
+  .particle {
+    position: absolute;
+    background: hsl(var(--crypto-pink));
+    border-radius: 50%;
+    opacity: 0.6;
+    animation: particleFloat 20s linear infinite;
+  }
+
+  .coin-rain {
+    position: absolute;
+    color: hsl(var(--crypto-gold));
+    font-size: 20px;
+    animation: coinFall 8s linear infinite;
+    opacity: 0.7;
+  }
+
   @keyframes glow {
     0% {
       box-shadow: 0 0 5px hsl(var(--crypto-pink));
     }
+
     100% {
       box-shadow: 0 0 20px hsl(var(--crypto-pink)), 0 0 30px hsl(var(--crypto-pink));
     }
   }
-  
+
   @keyframes jackpot {
-    0%, 100% {
+
+    0%,
+    100% {
       transform: scale(1);
     }
+
     50% {
       transform: scale(1.05);
+    }
+  }
+
+  @keyframes float {
+
+    0%,
+    100% {
+      transform: translateY(0px);
+    }
+
+    50% {
+      transform: translateY(-20px);
+    }
+  }
+
+  @keyframes slideIn {
+    from {
+      transform: translateX(-100%);
+      opacity: 0;
+    }
+
+    to {
+      transform: translateX(0);
+      opacity: 1;
+    }
+  }
+
+  @keyframes fadeIn {
+    from {
+      opacity: 0;
+      transform: translateY(30px);
+    }
+
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  @keyframes backgroundShift {
+
+    0%,
+    100% {
+      background-position: 0% 50%;
+    }
+
+    50% {
+      background-position: 100% 50%;
+    }
+  }
+
+  @keyframes sparkle {
+
+    0%,
+    100% {
+      opacity: 0;
+      transform: scale(0.5);
+    }
+
+    50% {
+      opacity: 1;
+      transform: scale(1);
+    }
+  }
+
+  @keyframes gradientFlow {
+    0% {
+      background-position: 0% 50%;
+    }
+
+    50% {
+      background-position: 100% 50%;
+    }
+
+    100% {
+      background-position: 0% 50%;
+    }
+  }
+
+  @keyframes particleFloat {
+    0% {
+      transform: translateY(100vh) rotate(0deg);
+      opacity: 0;
+    }
+
+    10% {
+      opacity: 0.6;
+    }
+
+    90% {
+      opacity: 0.6;
+    }
+
+    100% {
+      transform: translateY(-100px) rotate(360deg);
+      opacity: 0;
+    }
+  }
+
+  @keyframes coinFall {
+    0% {
+      transform: translateY(-100px) rotate(0deg);
+      opacity: 0;
+    }
+
+    10% {
+      opacity: 0.7;
+    }
+
+    90% {
+      opacity: 0.7;
+    }
+
+    100% {
+      transform: translateY(100vh) rotate(360deg);
+      opacity: 0;
     }
   }
 }

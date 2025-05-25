@@ -70,6 +70,60 @@ export default function Layout({ children }: LayoutProps) {
               </h1>
             </Link>
 
+            {/* Navigation Links */}
+            {user && (
+              <div className="flex items-center space-x-6">
+                <Link href="/" className="text-gray-300 hover:text-white transition-colors">
+                  Casino
+                </Link>
+                <Link href="/farm" className="text-gray-300 hover:text-white transition-colors flex items-center space-x-1">
+                  <span>🐱</span>
+                  <span>Cat Farm</span>
+                </Link>
+                
+                {/* Games Dropdown */}
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <Button variant="ghost" className="text-gray-300 hover:text-white">
+                      Games
+                    </Button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent className="crypto-gray border-crypto-pink/20">
+                    <DropdownMenuItem asChild>
+                      <Link href="/games/mines" className="flex items-center space-x-2">
+                        <span>💣</span>
+                        <span>Mines</span>
+                      </Link>
+                    </DropdownMenuItem>
+                    <DropdownMenuItem asChild>
+                      <Link href="/games/crash" className="flex items-center space-x-2">
+                        <span>📈</span>
+                        <span>Crash</span>
+                      </Link>
+                    </DropdownMenuItem>
+                    <DropdownMenuItem asChild>
+                      <Link href="/games/wheel" className="flex items-center space-x-2">
+                        <span>🎡</span>
+                        <span>Wheel</span>
+                      </Link>
+                    </DropdownMenuItem>
+                    <DropdownMenuItem asChild>
+                      <Link href="/games/hilo" className="flex items-center space-x-2">
+                        <span>🎯</span>
+                        <span>Hi-Lo</span>
+                      </Link>
+                    </DropdownMenuItem>
+                    <DropdownMenuItem asChild>
+                      <Link href="/games/dice" className="flex items-center space-x-2">
+                        <span>🎲</span>
+                        <span>Dice</span>
+                      </Link>
+                    </DropdownMenuItem>
+                  </DropdownMenuContent>
+                </DropdownMenu>
+              </div>
+            )}
+
             {user && (
               <>
                 {/* User Balance & Controls */}

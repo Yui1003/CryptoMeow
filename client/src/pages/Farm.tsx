@@ -115,7 +115,13 @@ export default function Farm() {
 
   const buyCatMutation = useMutation({
     mutationFn: async (catId: string) => {
+      console.log("Buying cat with ID:", catId);
       const response = await apiRequest("POST", "/api/farm/buy-cat", { catId });
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({ message: 'Network error' }));
+        console.error("Buy cat error response:", errorData);
+        throw new Error(errorData.message || `HTTP error! status: ${response.status}`);
+      }
       return response.json();
     },
     onSuccess: () => {
@@ -127,9 +133,10 @@ export default function Farm() {
       });
     },
     onError: (error: any) => {
+      console.error("Buy cat error:", error);
       toast({
         title: "Error",
-        description: error.message || "Failed to purchase cat",
+        description: error.message || "Failed to purchase cat. Check console for details.",
         variant: "destructive",
       });
     },

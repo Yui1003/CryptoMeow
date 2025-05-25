@@ -3,6 +3,7 @@ import { FileStorage } from "./fileStorage";
 import bcrypt from "bcrypt";
 
 export interface IStorage {
+  init(): Promise<void>;
   getUser(id: number): Promise<User | undefined>;
   getUserByUsername(username: string): Promise<User | undefined>;
   createUser(user: InsertUser): Promise<User>;
@@ -64,6 +65,11 @@ export class MemStorage implements IStorage {
 
     // Create admin user
     this.initializeAdminUser();
+  }
+
+  async init(): Promise<void> {
+    // MemStorage initialization is done in constructor
+    return Promise.resolve();
   }
 
   private async initializeAdminUser() {

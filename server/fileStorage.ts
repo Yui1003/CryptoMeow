@@ -13,6 +13,18 @@ interface StorageData {
   currentDepositId: number;
   currentWithdrawalId: number;
   currentGameHistoryId: number;
+  farmCats: FarmCat[];
+  currentFarmCatId: number;
+}
+
+interface FarmCat {
+  id: number;
+  userId: number;
+  catId: string;
+  level: number;
+  production: number;
+  lastClaim: Date;
+  createdAt: Date;
 }
 
 export class FileStorage {
@@ -46,6 +58,16 @@ export class FileStorage {
           this.data.jackpot.lastWonAt = new Date(this.data.jackpot.lastWonAt);
         }
         this.data.jackpot.updatedAt = new Date(this.data.jackpot.updatedAt);
+
+        if (this.data.farmCats) {
+          this.data.farmCats.forEach(cat => {
+            cat.lastClaim = new Date(cat.lastClaim);
+            cat.createdAt = new Date(cat.createdAt);
+          });
+        } else {
+          this.data.farmCats = [];
+          this.data.currentFarmCatId = 1;
+        }
       } else {
         this.data = {
           users: [],
@@ -63,6 +85,8 @@ export class FileStorage {
           currentDepositId: 1,
           currentWithdrawalId: 1,
           currentGameHistoryId: 1,
+          farmCats: [],
+          currentFarmCatId: 1,
         };
         this.initializeAdminUser();
       }
@@ -84,6 +108,8 @@ export class FileStorage {
         currentDepositId: 1,
         currentWithdrawalId: 1,
         currentGameHistoryId: 1,
+        farmCats: [],
+        currentFarmCatId: 1,
       };
       this.initializeAdminUser();
     }
@@ -175,7 +201,7 @@ export class FileStorage {
     const deposit = this.data.deposits.find(d => d.id === id);
     if (deposit) {
       deposit.status = status;
-      
+
       // If approved, update user balance
       if (status === "approved") {
         const user = this.data.users.find(u => u.id === deposit.userId);
@@ -224,7 +250,7 @@ export class FileStorage {
       createdAt: new Date(),
     };
     this.data.gameHistory.push(newGame);
-    
+
     // Update jackpot based on losses
     if (parseFloat(game.winAmount || "0") === 0) {
       const currentJackpot = parseFloat(this.data.jackpot.amount);
@@ -233,7 +259,7 @@ export class FileStorage {
       this.data.jackpot.amount = (currentJackpot + jackpotIncrease).toFixed(8);
       this.data.jackpot.updatedAt = new Date();
     }
-    
+
     this.saveData();
     return newGame;
   }
@@ -269,5 +295,87 @@ export class FileStorage {
       user.isBanned = banned;
       this.saveData();
     }
+  }
+
+  async getFarmData(userId: number): Promise<any> {
+    if (!this.data.farmCats) {
+      this.data.farmCats = [];
+    }
+    const userCats = this.data.farmCats.filter(cat => cat.userId === userId);
+
+    let totalProduction = 0;
+    let unclaimedMeow = 0;
+    const now = new Date();
+
+    const catsWithProduction = userCats.map(cat => {
+      const hoursSinceLastClaim = (now.getTime() - cat.lastClaim.getTime()) / (1000 * 60 * 60);
+      const earnedSinceLastClaim = cat.production * hoursSinceLastClaim;
+
+      totalProduction += cat.production;
+      unclaimedMeow += earnedSinceLastClaim;
+
+      return {
+        id: cat.id.toString(),
+        catId: cat.catId,
+        level: cat.level,
+        lastClaim: cat.lastClaim.toISOString(),
+        production: cat.production
+      };
+    });
+
+    return {
+      cats: catsWithProduction,
+      totalProduction,
+      unclaimedMeow: unclaimedMeow.toFixed(8)
+    };
+  }
+
+  async createFarmCat(data: { userId: number; catId: string; production: number }): Promise<any> {
+    if (!this.data.farmCats) {
+      this.data.farmCats = [];
+    }
+    if (!this.data.currentFarmCatId) {
+      this.data.currentFarmCatId = 1;
+    }
+    
+    const id = this.data.currentFarmCatId++;
+    const now = new Date();
+
+    const farmCat: FarmCat = {
+      id,
+      userId: data.userId,
+      catId: data.catId,
+      level: 1,
+      production: data.production,
+      lastClaim: now,
+      createdAt: now
+    };
+
+    this.data.farmCats.push(farmCat);
+    this.saveData();
+    return farmCat;
+  }
+
+  async getFarmCat(id: number): Promise<any> {
+    return this.data.farmCats.find(cat => cat.id === id) || null;
+  }
+
+  async upgradeFarmCat(id: number, level: number, production: number): Promise<void> {
+    const catIndex = this.data.farmCats.findIndex(cat => cat.id === id);
+    if (catIndex !== -1) {
+      this.data.farmCats[catIndex].level = level;
+      this.data.farmCats[catIndex].production = production;
+      this.saveData();
+    }
+  }
+
+  async claimFarmRewards(userId: number): Promise<void> {
+    const now = new Date();
+    this.data.farmCats.forEach(cat => {
+      if (cat.userId === userId) {
+        cat.lastClaim = now;
+      }
+    });
+    this.saveData();
   }
 }

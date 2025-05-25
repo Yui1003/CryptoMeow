@@ -1,10 +1,15 @@
 import express, { type Request, Response, NextFunction } from "express";
+import cors from "cors";
 import { registerRoutes } from "./routes";
 import { setupVite, serveStatic, log } from "./vite";
+import { storage } from "./storage";
 
 const app = express();
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
+
+// Enable CORS for all origins in development
+app.use(cors());
 
 app.use((req, res, next) => {
   const start = Date.now();
@@ -60,7 +65,7 @@ app.use((req, res, next) => {
   // this serves both the API and the client.
   // It is the only port that is not firewalled.
 const port = 3000;
-server.listen(port, "localhost", () => {
+server.listen(port, "0.0.0.0", () => {
   log(`serving on port ${port}`);
 });
 })();
