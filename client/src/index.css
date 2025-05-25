@@ -409,3 +409,16 @@
     }
   }
 }
+
+.crypto-black {
+    background-color: hsl(var(--crypto-black));
+  }
+
+  .fill-green-500 { fill: #10b981; }
+  .fill-green-400 { fill: #34d399; }
+  .fill-yellow-500 { fill: #eab308; }
+  .fill-orange-500 { fill: #f97316; }
+  .fill-red-500 { fill: #ef4444; }
+  .fill-purple-500 { fill: #a855f7; }
+  .stroke-crypto-gold { stroke: #ffd700; }
+  .stroke-gray-800 { stroke: #1f2937; }

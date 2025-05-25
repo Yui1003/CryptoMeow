@@ -297,11 +297,11 @@ export default function Home() {
                   style={{ animationDelay: "0.3s" }}
                 >
                   <GameCard
-                    title="Wheel of Fortune"
-                    description="Spin the wheel and let fortune decide your fate! Choose your risk level and potential rewards."
-                    imageUrl="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcR2IfhpM8WLAZZkTnVX8-5Wj1fMiJ-3vTJH6Q&s"
+                    title="Lucky 7s Slots"
+                    description="Classic slot machine with fruit symbols and lucky 7s! Match 3 symbols for big wins."
+                    imageUrl="https://images.unsplash.com/photo-1596838132731-3301c3fd4317?w=500&h=300&fit=crop"
                     players={156}
-                    maxWin="50.00x"
+                    maxWin="20.00x"
                     gameUrl="/games/wheel"
                   />
                 </div>
@@ -353,6 +353,13 @@ export default function Home() {
                     </div>
                   </Card>
                 </div>
+                  <GameCard 
+          title="Lucky 7s Slots"
+          description="Spin the slots with 50% win chance! Win big with symbol combinations!"
+          icon="🎰"
+          route="/games/wheel"
+          available={true}
+        />
               </div>
             </div>
 

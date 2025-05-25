@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { apiRequest } from "@/lib/queryClient";
@@ -6,42 +7,19 @@ import { useToast } from "@/hooks/use-toast";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import BettingPanel from "@/components/BettingPanel";
-import { generateServerSeed, generateClientSeed, calculateResult, wheelResult } from "@/lib/provablyFair";
-import { RotateCcw, Disc3 } from "lucide-react";
+import { generateServerSeed, generateClientSeed, calculateResult } from "@/lib/provablyFair";
+import { Sparkles, RotateCcw } from "lucide-react";
 
-interface WheelSegment {
-  multiplier: number;
-  color: string;
-  weight: number;
-}
-
-const RISK_LEVELS = {
-  low: [
-    { multiplier: 1.2, color: "bg-green-500", weight: 40 },
-    { multiplier: 1.5, color: "bg-green-400", weight: 30 },
-    { multiplier: 2.0, color: "bg-yellow-500", weight: 20 },
-    { multiplier: 3.0, color: "bg-orange-500", weight: 8 },
-    { multiplier: 5.0, color: "bg-red-500", weight: 2 },
-  ],
-  medium: [
-    { multiplier: 1.5, color: "bg-green-500", weight: 30 },
-    { multiplier: 2.0, color: "bg-green-400", weight: 25 },
-    { multiplier: 3.0, color: "bg-yellow-500", weight: 20 },
-    { multiplier: 5.0, color: "bg-orange-500", weight: 15 },
-    { multiplier: 10.0, color: "bg-red-500", weight: 8 },
-    { multiplier: 20.0, color: "bg-purple-500", weight: 2 },
-  ],
-  high: [
-    { multiplier: 2.0, color: "bg-green-500", weight: 25 },
-    { multiplier: 3.0, color: "bg-green-400", weight: 20 },
-    { multiplier: 5.0, color: "bg-yellow-500", weight: 18 },
-    { multiplier: 10.0, color: "bg-orange-500", weight: 15 },
-    { multiplier: 20.0, color: "bg-red-500", weight: 12 },
-    { multiplier: 50.0, color: "bg-purple-500", weight: 10 },
-  ],
-};
+const SYMBOLS = [
+  { symbol: "🍒", value: "cherry", color: "text-red-500", multiplier: 2 },
+  { symbol: "🍋", value: "lemon", color: "text-yellow-500", multiplier: 3 },
+  { symbol: "🍊", value: "orange", color: "text-orange-500", multiplier: 4 },
+  { symbol: "🍇", value: "grape", color: "text-purple-500", multiplier: 5 },
+  { symbol: "🔔", value: "bell", color: "text-yellow-400", multiplier: 8 },
+  { symbol: "💎", value: "diamond", color: "text-blue-400", multiplier: 10 },
+  { symbol: "7️⃣", value: "seven", color: "text-red-600", multiplier: 20 },
+];
 
 export default function Wheel() {
   const { user } = useAuth();
@@ -49,11 +27,10 @@ export default function Wheel() {
   const queryClient = useQueryClient();
   
   const [selectedBet, setSelectedBet] = useState(1.00);
-  const [riskLevel, setRiskLevel] = useState<keyof typeof RISK_LEVELS>("medium");
   const [isSpinning, setIsSpinning] = useState(false);
-  const [winningSegment, setWinningSegment] = useState<number | null>(null);
-  const [spinHistory, setSpinHistory] = useState<number[]>([]);
-  const [rotation, setRotation] = useState(0);
+  const [reels, setReels] = useState([0, 0, 0]);
+  const [winningCombination, setWinningCombination] = useState<number[] | null>(null);
+  const [spinHistory, setSpinHistory] = useState<{ symbols: string[], multiplier: number }[]>([]);
 
   const playGameMutation = useMutation({
     mutationFn: async (gameData: any) => {
@@ -71,7 +48,41 @@ export default function Wheel() {
     },
   });
 
-  const spinWheel = () => {
+  const getRandomSymbolIndex = (result: number, offset: number): number => {
+    const adjustedResult = (result + offset) % 1;
+    return Math.floor(adjustedResult * SYMBOLS.length);
+  };
+
+  const calculateWin = (symbolIndices: number[], result: number): { multiplier: number, isWin: boolean } => {
+    // 50% win chance - if result > 0.5, it's a win
+    const isWin = result > 0.5;
+    
+    if (!isWin) {
+      return { multiplier: 0, isWin: false };
+    }
+    
+    // Check for three of a kind (higher payout)
+    if (symbolIndices[0] === symbolIndices[1] && symbolIndices[1] === symbolIndices[2]) {
+      return { multiplier: SYMBOLS[symbolIndices[0]].multiplier, isWin: true };
+    }
+    
+    // Check for two of a kind (medium payout)
+    const counts = symbolIndices.reduce((acc, index) => {
+      acc[index] = (acc[index] || 0) + 1;
+      return acc;
+    }, {} as Record<number, number>);
+    
+    for (const [index, count] of Object.entries(counts)) {
+      if (count === 2) {
+        return { multiplier: SYMBOLS[parseInt(index)].multiplier * 0.5, isWin: true };
+      }
+    }
+    
+    // Any other combination when win = 1.8x (regular win)
+    return { multiplier: 1.8, isWin: true };
+  };
+
+  const spinSlots = () => {
     if (!user || parseFloat(user.balance) < selectedBet) {
       toast({
         title: "Error",
@@ -82,72 +93,110 @@ export default function Wheel() {
     }
 
     setIsSpinning(true);
+    setWinningCombination(null);
     
     const serverSeed = generateServerSeed();
     const clientSeed = generateClientSeed();
-    const nonce = Date.now();
+    const nonce = Math.floor(Math.random() * 1000000);
     
     const result = calculateResult(serverSeed, clientSeed, nonce);
-    const segments = RISK_LEVELS[riskLevel];
-    const weights = segments.map(s => s.weight);
-    const winningIndex = wheelResult(result, weights);
-    const winningMultiplier = segments[winningIndex].multiplier;
     
-    // Calculate rotation for visual effect
-    const segmentAngle = 360 / segments.length;
-    const targetRotation = rotation + 360 * 3 + (winningIndex * segmentAngle) + (segmentAngle / 2);
-    setRotation(targetRotation);
+    // Generate three symbol indices
+    const symbolIndices = [
+      getRandomSymbolIndex(result, 0),
+      getRandomSymbolIndex(result, 0.33),
+      getRandomSymbolIndex(result, 0.66)
+    ];
     
-    setTimeout(() => {
-      setWinningSegment(winningIndex);
+    const { multiplier, isWin } = calculateWin(symbolIndices, result);
+    
+    // Animate the reels
+    const animationDuration = 2000;
+    const reelAnimations = symbolIndices.map((_, index) => {
+      return new Promise<void>((resolve) => {
+        let currentSymbol = reels[index];
+        const interval = setInterval(() => {
+          currentSymbol = (currentSymbol + 1) % SYMBOLS.length;
+          setReels(prev => {
+            const newReels = [...prev];
+            newReels[index] = currentSymbol;
+            return newReels;
+          });
+        }, 100);
+        
+        setTimeout(() => {
+          clearInterval(interval);
+          setReels(prev => {
+            const newReels = [...prev];
+            newReels[index] = symbolIndices[index];
+            return newReels;
+          });
+          resolve();
+        }, animationDuration + (index * 300));
+      });
+    });
+
+    Promise.all(reelAnimations).then(() => {
       setIsSpinning(false);
       
-      const winAmount = selectedBet * winningMultiplier;
+      if (isWin) {
+        setWinningCombination(symbolIndices);
+        setTimeout(() => setWinningCombination(null), 3000);
+      }
       
-      toast({
-        title: "🎊 Wheel Stopped!",
-        description: `You won ${winAmount.toFixed(2)} coins with ${winningMultiplier}x multiplier!`,
-      });
+      const winAmount = isWin ? selectedBet * multiplier : 0;
+      
+      if (isWin) {
+        toast({
+          title: "🎊 Winner!",
+          description: `You won ${winAmount.toFixed(2)} coins with ${multiplier}x multiplier!`,
+        });
+      } else {
+        toast({
+          title: "💥 No Win",
+          description: `Better luck next time!`,
+          variant: "destructive",
+        });
+      }
 
       playGameMutation.mutate({
-        gameType: "wheel",
+        gameType: "slots",
         betAmount: selectedBet.toString(),
         winAmount: winAmount.toString(),
         serverSeed,
         clientSeed,
         nonce,
         result: JSON.stringify({ 
-          riskLevel, 
-          winningIndex, 
-          multiplier: winningMultiplier 
+          symbolIndices, 
+          multiplier,
+          isWin
         }),
       });
       
-      setSpinHistory(prev => [winningMultiplier, ...prev.slice(0, 9)]);
-      
-      // Reset winning segment after delay
-      setTimeout(() => {
-        setWinningSegment(null);
-      }, 3000);
-    }, 3000);
+      setSpinHistory(prev => [
+        { 
+          symbols: symbolIndices.map(i => SYMBOLS[i].symbol), 
+          multiplier 
+        }, 
+        ...prev.slice(0, 9)
+      ]);
+    });
   };
 
-  const resetWheel = () => {
+  const resetSlots = () => {
     if (!isSpinning) {
-      setWinningSegment(null);
-      setRotation(0);
+      setReels([0, 0, 0]);
+      setWinningCombination(null);
     }
   };
 
   if (!user) return null;
 
-  const segments = RISK_LEVELS[riskLevel];
-
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
       <div className="flex items-center mb-8">
-        <Disc3 className="w-8 h-8 crypto-pink mr-3" />
-        <h1 className="text-3xl font-bold">Wheel of Fortune</h1>
+        <Sparkles className="w-8 h-8 crypto-pink mr-3" />
+        <h1 className="text-3xl font-bold">Lucky 7s Slots</h1>
         <Badge variant="secondary" className="ml-4">
           Provably Fair
         </Badge>
@@ -155,14 +204,14 @@ export default function Wheel() {
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
         
-        {/* Wheel Display */}
+        {/* Slot Machine */}
         <div className="lg:col-span-2">
           <Card className="crypto-gray border-crypto-pink/20">
             <CardHeader>
               <CardTitle className="flex items-center justify-between">
-                <span>Wheel</span>
+                <span>Slot Machine</span>
                 <Button
-                  onClick={resetWheel}
+                  onClick={resetSlots}
                   variant="outline"
                   size="sm"
                   className="border-crypto-pink/30 hover:bg-crypto-pink"
@@ -174,81 +223,70 @@ export default function Wheel() {
               </CardTitle>
             </CardHeader>
             <CardContent>
+              {/* Slot Reels */}
               <div className="flex items-center justify-center p-8">
-                <div className="relative">
-                  {/* Pointer */}
-                  <div className="absolute -top-6 left-1/2 transform -translate-x-1/2 z-10">
-                    <div className="w-0 h-0 border-l-4 border-r-4 border-b-8 border-l-transparent border-r-transparent border-b-crypto-pink"></div>
-                  </div>
-                  
-                  {/* Wheel */}
-                  <div 
-                    className={`w-80 h-80 rounded-full border-4 border-crypto-pink relative transition-transform duration-3000 ease-out ${
-                      isSpinning ? 'animate-spin' : ''
-                    }`}
-                    style={{ 
-                      transform: `rotate(${rotation}deg)`,
-                      transitionDuration: isSpinning ? '3000ms' : '0ms'
-                    }}
-                  >
-                    {segments.map((segment, index) => {
-                      const segmentAngle = 360 / segments.length;
-                      const rotation = index * segmentAngle;
-                      const isWinning = winningSegment === index;
-                      const startAngle = (rotation - segmentAngle/2) * Math.PI / 180;
-                      const endAngle = (rotation + segmentAngle/2) * Math.PI / 180;
-                      
-                      return (
-                        <div
-                          key={index}
-                          className={`absolute inset-0 ${segment.color} ${
-                            isWinning ? 'ring-4 ring-crypto-gold' : ''
-                          }`}
-                          style={{
-                            clipPath: `path('M 160,160 L ${
-                              160 + 160 * Math.cos(startAngle)
-                            },${
-                              160 + 160 * Math.sin(startAngle)
-                            } A 160,160 0 0,1 ${
-                              160 + 160 * Math.cos(endAngle)
-                            },${
-                              160 + 160 * Math.sin(endAngle)
-                            } Z')`
-                          }}
-                        >
-                          <div 
-                            className="absolute inset-0 flex items-center justify-center text-white font-bold text-2xl"
-                            style={{
-                              transform: `rotate(${rotation}deg) translateY(-100px)`,
-                              transformOrigin: '50% 160px'
-                            }}
-                          >
-                            {segment.multiplier}x
-                          </div>
-                        </div>
-                      );
-                    })}
+                <div className="bg-black/40 p-6 rounded-lg border-4 border-crypto-pink/50">
+                  <div className="flex space-x-4">
+                    {reels.map((symbolIndex, reelIndex) => (
+                      <div
+                        key={reelIndex}
+                        className={`
+                          w-24 h-24 bg-gray-800 border-2 border-crypto-pink/30 rounded-lg 
+                          flex items-center justify-center text-4xl font-bold
+                          transition-all duration-300
+                          ${winningCombination?.includes(symbolIndex) ? 'border-yellow-400 bg-yellow-400/20 animate-pulse' : ''}
+                          ${isSpinning ? 'animate-bounce' : ''}
+                        `}
+                      >
+                        <span className={SYMBOLS[symbolIndex].color}>
+                          {SYMBOLS[symbolIndex].symbol}
+                        </span>
+                      </div>
+                    ))}
                   </div>
                 </div>
+              </div>
+
+              {/* Paytable */}
+              <div className="mt-6">
+                <h3 className="text-lg font-semibold mb-4">Paytable</h3>
+                <div className="grid grid-cols-2 md:grid-cols-4 gap-2 text-sm">
+                  {SYMBOLS.map((symbol, index) => (
+                    <div key={index} className="flex items-center space-x-2 p-2 bg-gray-800 rounded">
+                      <span className={`text-lg ${symbol.color}`}>{symbol.symbol}</span>
+                      <span className="text-xs">3x = {symbol.multiplier}x</span>
+                    </div>
+                  ))}
+                </div>
+                <p className="text-xs text-gray-400 mt-2">
+                  50% Win Chance • Regular win = 1.8x • 2 of a kind = 0.5x symbol multiplier • 3 of a kind = full symbol multiplier
+                </p>
               </div>
               
               {/* Spin History */}
               <div className="mt-6">
                 <h3 className="text-sm font-medium text-gray-400 mb-2">Recent Spins</h3>
                 <div className="flex space-x-2 overflow-x-auto">
-                  {spinHistory.map((multiplier, index) => (
-                    <Badge 
+                  {spinHistory.map((spin, index) => (
+                    <div 
                       key={index} 
-                      variant="outline" 
-                      className={`min-w-fit ${
-                        multiplier >= 10 ? "border-crypto-pink text-crypto-pink" :
-                        multiplier >= 5 ? "border-crypto-gold text-crypto-gold" :
-                        multiplier >= 2 ? "border-crypto-green text-crypto-green" :
-                        "border-gray-400 text-gray-400"
-                      }`}
+                      className="min-w-fit flex items-center space-x-1 p-2 bg-gray-800 rounded"
                     >
-                      {multiplier}x
-                    </Badge>
+                      {spin.symbols.map((symbol, i) => (
+                        <span key={i} className="text-sm">{symbol}</span>
+                      ))}
+                      <Badge 
+                        variant="outline" 
+                        className={`ml-2 ${
+                          spin.multiplier === 0 ? "border-gray-500 text-gray-500" :
+                          spin.multiplier >= 10 ? "border-crypto-pink text-crypto-pink" :
+                          spin.multiplier >= 5 ? "border-crypto-gold text-crypto-gold" :
+                          "border-crypto-green text-crypto-green"
+                        }`}
+                      >
+                        {spin.multiplier === 0 ? 'L' : `${spin.multiplier}x`}
+                      </Badge>
+                    </div>
                   ))}
                 </div>
               </div>
@@ -264,51 +302,40 @@ export default function Wheel() {
             </CardHeader>
             <CardContent className="space-y-4">
               <div>
-                <label className="block text-sm font-medium mb-2">Risk Level</label>
-                <Select 
-                  value={riskLevel} 
-                  onValueChange={(value: keyof typeof RISK_LEVELS) => setRiskLevel(value)}
-                  disabled={isSpinning}
-                >
-                  <SelectTrigger className="crypto-black border-crypto-pink/30">
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent className="crypto-gray border-crypto-pink/20">
-                    <SelectItem value="low">Low Risk (Max 5x)</SelectItem>
-                    <SelectItem value="medium">Medium Risk (Max 20x)</SelectItem>
-                    <SelectItem value="high">High Risk (Max 50x)</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium mb-2">Multiplier Range</label>
-                <div className="text-sm crypto-green">
-                  {Math.min(...segments.map(s => s.multiplier))}x - {Math.max(...segments.map(s => s.multiplier))}x
-                </div>
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium mb-2">Bet Amount</label>
+                <label className="block text-sm font-medium mb-2">Current Bet</label>
                 <div className="text-xl font-semibold crypto-gold">
                   {selectedBet.toFixed(2)} coins
                 </div>
               </div>
 
+              <div>
+                <label className="block text-sm font-medium mb-2">Win Chance</label>
+                <div className="text-sm crypto-green">
+                  50%
+                </div>
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium mb-2">Max Payout</label>
+                <div className="text-sm crypto-green">
+                  Up to {(selectedBet * 20).toFixed(2)} coins (20x)
+                </div>
+              </div>
+
               <Button
-                onClick={spinWheel}
+                onClick={spinSlots}
                 disabled={isSpinning || parseFloat(user.balance) < selectedBet}
                 className="w-full gradient-pink hover:opacity-90 transition-opacity"
               >
                 {isSpinning ? (
                   <>
-                    <Disc3 className="w-4 h-4 mr-2 animate-spin" />
+                    <Sparkles className="w-4 h-4 mr-2 animate-spin" />
                     Spinning...
                   </>
                 ) : (
                   <>
-                    <Disc3 className="w-4 h-4 mr-2" />
-                    Spin Wheel ({selectedBet} coins)
+                    <Sparkles className="w-4 h-4 mr-2" />
+                    Spin ({selectedBet} coins)
                   </>
                 )}
               </Button>
