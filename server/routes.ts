@@ -3,6 +3,9 @@ import { createServer, type Server } from "http";
 import { storage } from "./storage";
 import bcrypt from "bcrypt";
 import session from "express-session";
+import multer from "multer";
+import path from "path";
+import fs from "fs";
 import { insertUserSchema, insertDepositSchema, insertWithdrawalSchema, insertGameHistorySchema } from "@shared/schema";
 import { z } from "zod";
 
@@ -13,6 +16,44 @@ declare module 'express-session' {
 }
 
 export async function registerRoutes(app: Express): Promise<Server> {
+  // Ensure uploads directory exists
+  const uploadsDir = path.join(process.cwd(), 'uploads');
+  if (!fs.existsSync(uploadsDir)) {
+    fs.mkdirSync(uploadsDir, { recursive: true });
+  }
+
+  // Multer configuration for file uploads
+  const storage_multer = multer.diskStorage({
+    destination: function (req, file, cb) {
+      cb(null, uploadsDir);
+    },
+    filename: function (req, file, cb) {
+      const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
+      cb(null, 'receipt-' + uniqueSuffix + path.extname(file.originalname));
+    }
+  });
+
+  const upload = multer({ 
+    storage: storage_multer,
+    limits: { fileSize: 5 * 1024 * 1024 }, // 5MB limit
+    fileFilter: function (req, file, cb) {
+      if (file.mimetype.startsWith('image/')) {
+        cb(null, true);
+      } else {
+        cb(new Error('Only image files are allowed!'));
+      }
+    }
+  });
+
+  // Serve uploaded files
+  app.use('/uploads', (req, res, next) => {
+    // Add basic auth check for receipt access
+    if (!req.session.userId) {
+      return res.status(401).json({ message: "Authentication required" });
+    }
+    next();
+  }, require('express').static(uploadsDir));
+
   // Session middleware
   app.use(session({
     secret: process.env.SESSION_SECRET || 'cryptomeow-secret-key',
@@ -164,9 +205,22 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Deposit routes
-  app.post("/api/deposits", requireAuth, async (req, res) => {
+  app.post("/api/deposits", requireAuth, upload.single('receipt'), async (req, res) => {
     try {
-      const depositData = insertDepositSchema.parse(req.body);
+      const { amount, paymentMethod } = req.body;
+      
+      if (!req.file) {
+        return res.status(400).json({ message: "Receipt file is required" });
+      }
+
+      const receiptUrl = `/uploads/${req.file.filename}`;
+      
+      const depositData = {
+        amount,
+        paymentMethod,
+        receiptUrl
+      };
+      
       const deposit = await storage.createDeposit({
         ...depositData,
         userId: req.session.userId!
@@ -175,6 +229,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.json(deposit);
     } catch (error) {
       console.error("Deposit error:", error);
+      if (error instanceof multer.MulterError) {
+        if (error.code === 'LIMIT_FILE_SIZE') {
+          return res.status(400).json({ message: "File too large. Maximum size is 5MB." });
+        }
+        return res.status(400).json({ message: "File upload error: " + error.message });
+      }
       res.status(400).json({ message: "Invalid deposit data" });
     }
   });

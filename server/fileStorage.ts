@@ -179,13 +179,13 @@ export class FileStorage {
     }
   }
 
-  async createDeposit(deposit: InsertDeposit & { userId: number }): Promise<Deposit> {
+  async createDeposit(deposit: InsertDeposit & { userId: number; receiptUrl?: string }): Promise<Deposit> {
     const id = this.data.currentDepositId++;
     const newDeposit: Deposit = {
       ...deposit,
       id,
       status: "pending",
-      receiptUrl: null,
+      receiptUrl: deposit.receiptUrl || null,
       createdAt: new Date(),
     };
     this.data.deposits.push(newDeposit);

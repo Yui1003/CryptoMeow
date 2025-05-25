@@ -13,9 +13,10 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { useToast } from "@/hooks/use-toast";
 import { User, Deposit, Withdrawal, GameHistory } from "@shared/schema";
-import { Shield, Ban, Check, X } from "lucide-react";
+import { Shield, Ban, Check, X, Eye, Image } from "lucide-react";
 import { useLocation } from "wouter";
 
 export default function Admin() {
@@ -158,6 +159,7 @@ export default function Admin() {
                     <TableHead>Amount</TableHead>
                     <TableHead>Method</TableHead>
                     <TableHead>Status</TableHead>
+                    <TableHead>Receipt</TableHead>
                     <TableHead>Date</TableHead>
                     <TableHead>Actions</TableHead>
                   </TableRow>
@@ -177,6 +179,39 @@ export default function Admin() {
                         >
                           {deposit.status}
                         </Badge>
+                      </TableCell>
+                      <TableCell>
+                        {deposit.receiptUrl ? (
+                          <Dialog>
+                            <DialogTrigger asChild>
+                              <Button size="sm" variant="outline">
+                                <Eye className="w-4 h-4 mr-1" />
+                                View Receipt
+                              </Button>
+                            </DialogTrigger>
+                            <DialogContent className="max-w-2xl">
+                              <DialogHeader>
+                                <DialogTitle>Payment Receipt</DialogTitle>
+                              </DialogHeader>
+                              <div className="flex justify-center">
+                                <img 
+                                  src={deposit.receiptUrl} 
+                                  alt="Payment Receipt" 
+                                  className="max-w-full max-h-96 object-contain rounded-lg"
+                                  onError={(e) => {
+                                    const target = e.target as HTMLImageElement;
+                                    target.src = 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjAwIiBoZWlnaHQ9IjIwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cmVjdCB3aWR0aD0iMTAwJSIgaGVpZ2h0PSIxMDAlIiBmaWxsPSIjZGRkIi8+PHRleHQgeD0iNTAlIiB5PSI1MCUiIGZvbnQtZmFtaWx5PSJBcmlhbCIgZm9udC1zaXplPSIxNCIgZmlsbD0iIzk5OSIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZHk9Ii4zZW0iPkltYWdlIG5vdCBmb3VuZDwvdGV4dD48L3N2Zz4=';
+                                  }}
+                                />
+                              </div>
+                            </DialogContent>
+                          </Dialog>
+                        ) : (
+                          <span className="text-gray-400 flex items-center">
+                            <Image className="w-4 h-4 mr-1" />
+                            No receipt
+                          </span>
+                        )}
                       </TableCell>
                       <TableCell>{new Date(deposit.createdAt).toLocaleDateString()}</TableCell>
                       <TableCell>

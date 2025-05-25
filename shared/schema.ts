@@ -68,9 +68,10 @@ export const insertUserSchema = createInsertSchema(users).pick({
   password: true,
 });
 
-export const insertDepositSchema = createInsertSchema(deposits).pick({
-  amount: true,
-  paymentMethod: true,
+export const insertDepositSchema = z.object({
+  amount: z.string().min(1, "Amount is required"),
+  paymentMethod: z.string().min(1, "Payment method is required"),
+  receiptUrl: z.string().optional(),
 });
 
 export const insertWithdrawalSchema = createInsertSchema(withdrawals).pick({

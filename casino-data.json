@@ -14,8 +14,8 @@
       "id": 1,
       "username": "admin",
       "password": "$2b$10$yiQUwI1/UJh4Y01jeDNBBOSO5rNsMOnsMpHRB7BCJhLY8El7J.oUi",
-      "balance": "2249.20",
-      "meowBalance": "86.77792175",
+      "balance": "252249.20",
+      "meowBalance": "36.77792175",
       "isAdmin": true,
       "isBanned": false,
       "createdAt": "2025-05-24T19:43:45.385Z"

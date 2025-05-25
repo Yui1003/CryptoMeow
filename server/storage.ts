@@ -125,13 +125,13 @@ export class MemStorage implements IStorage {
     }
   }
 
-  async createDeposit(deposit: InsertDeposit & { userId: number }): Promise<Deposit> {
+  async createDeposit(deposit: InsertDeposit & { userId: number; receiptUrl?: string }): Promise<Deposit> {
     const id = this.currentDepositId++;
     const newDeposit: Deposit = {
       ...deposit,
       id,
       status: "pending",
-      receiptUrl: null,
+      receiptUrl: deposit.receiptUrl || null,
       createdAt: new Date(),
     };
     this.deposits.set(id, newDeposit);
@@ -199,8 +199,7 @@ export class MemStorage implements IStorage {
     if (parseFloat(game.winAmount || "0") === 0) {
       const currentJackpot = parseFloat(this.jackpotData.amount);
       const betAmount = parseFloat(game.betAmount);
-      // 1 MEOW per 7000 coins lost (1/7000 = 0.00014286 MEOW per coin)
-      const jackpotIncrease = betAmount * 0.00014286;
+      const jackpotIncrease = betAmount * 0.01; // 1% of losses go to jackpot
       this.jackpotData.amount = (currentJackpot + jackpotIncrease).toFixed(8);
       this.jackpotData.updatedAt = new Date();
     }
