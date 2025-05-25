@@ -79,14 +79,14 @@ export default function Withdraw() {
     <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
       <div className="flex items-center mb-8">
         <Download className="w-8 h-8 crypto-pink mr-3" />
-        <h1 className="text-3xl font-bold">Withdraw Funds</h1>
+        <h1 className="text-3xl font-bold text-white">Withdraw Funds</h1>
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
         {/* Withdrawal Form */}
         <Card className="crypto-gray border-crypto-pink/20">
           <CardHeader>
-            <CardTitle>Request Withdrawal</CardTitle>
+            <CardTitle className="text-white">Request Withdrawal</CardTitle>
           </CardHeader>
           <CardContent>
             <div className="mb-6 p-4 crypto-black rounded-lg border border-crypto-pink/30">
@@ -173,7 +173,7 @@ export default function Withdraw() {
         {/* Withdrawal Information */}
         <Card className="crypto-gray border-crypto-pink/20">
           <CardHeader>
-            <CardTitle>Withdrawal Information</CardTitle>
+            <CardTitle className="text-white">Withdrawal Information</CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
             <div className="flex items-start space-x-3 p-3 bg-yellow-500/10 border border-yellow-500/20 rounded-lg">

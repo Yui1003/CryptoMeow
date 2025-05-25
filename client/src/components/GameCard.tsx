@@ -31,7 +31,7 @@ export default function GameCard({
       />
       <CardContent className="p-6">
         <div className="flex items-center justify-between mb-3">
-          <h3 className="text-xl font-bold">{title}</h3>
+          <h3 className="text-xl font-bold text-white">{title}</h3>
           <div className="flex items-center space-x-1 crypto-green">
             <Users className="w-4 h-4" />
             <span className="text-sm">{players}</span>

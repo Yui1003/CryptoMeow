@@ -72,14 +72,14 @@ export default function Deposit() {
     <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
       <div className="flex items-center mb-8">
         <Upload className="w-8 h-8 crypto-pink mr-3" />
-        <h1 className="text-3xl font-bold">Deposit Funds</h1>
+        <h1 className="text-3xl font-bold text-white">Deposit Funds</h1>
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
         {/* Deposit Form */}
         <Card className="crypto-gray border-crypto-pink/20">
           <CardHeader>
-            <CardTitle>Make a Deposit</CardTitle>
+            <CardTitle className="text-white">Make a Deposit</CardTitle>
           </CardHeader>
           <CardContent>
             <form onSubmit={handleSubmit} className="space-y-6">
@@ -137,7 +137,7 @@ export default function Deposit() {
         {/* Instructions */}
         <Card className="crypto-gray border-crypto-pink/20">
           <CardHeader>
-            <CardTitle>Deposit Instructions</CardTitle>
+            <CardTitle className="text-white">Deposit Instructions</CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
             <div>

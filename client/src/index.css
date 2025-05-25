@@ -72,7 +72,7 @@
     color: hsl(var(--foreground)) !important;
     overflow-x: hidden;
   }
-  
+
   html {
     overflow-x: hidden;
   }
@@ -166,6 +166,18 @@
 
   .hover\:bg-crypto-pink-light:hover {
     background-color: hsl(var(--crypto-pink-light));
+  }
+
+  .hover\:text-black:hover {
+    color: black;
+  }
+
+  .text-white-hover-black {
+    color: white;
+  }
+
+  .text-white-hover-black:hover {
+    color: black;
   }
 }
 
@@ -322,6 +334,10 @@
 
     50% {
       background-position: 100% 50%;
+    }
+
+    100% {
+      background-position: 0% 50%;
     }
   }
 

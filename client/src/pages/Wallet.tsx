@@ -51,7 +51,7 @@ export default function Wallet() {
             <CardTitle className="text-sm font-medium text-gray-400">$MEOW Balance</CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold crypto-gold">
+            <div className="text-2xl font-bold text-crypto-pink">
               {parseFloat(user.meowBalance).toFixed(4)} $MEOW
             </div>
           </CardContent>
@@ -73,7 +73,7 @@ export default function Wallet() {
             <CardTitle className="text-sm font-medium text-gray-400">Total $MEOW Won</CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold crypto-gold">
+            <div className="text-2xl font-bold text-crypto-pink">
               {totalMeowWon.toFixed(4)} $MEOW
             </div>
           </CardContent>
@@ -116,7 +116,7 @@ export default function Wallet() {
                         {isWin ? <TrendingUp className="w-4 h-4 inline mr-1" /> : <TrendingDown className="w-4 h-4 inline mr-1" />}
                         {parseFloat(game.winAmount).toFixed(2)} coins
                       </TableCell>
-                      <TableCell className="crypto-gold">
+                      <TableCell className="text-crypto-pink">
                         {parseFloat(game.meowWon).toFixed(4)} $MEOW
                         {isMeowWin && <Badge variant="secondary" className="ml-2">JACKPOT!</Badge>}
                       </TableCell>

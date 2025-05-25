@@ -237,7 +237,7 @@ export default function Home() {
                     <Button
                       onClick={handleConvert}
                       disabled={convertMutation.isPending}
-                      className="w-full bg-crypto-green hover:bg-green-500 text-black font-semibold"
+                      className="w-full bg-crypto-green hover:bg-green-500 text-white hover:text-black font-semibold"
                     >
                       {convertMutation.isPending
                         ? "Converting..."

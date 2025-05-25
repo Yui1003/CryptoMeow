@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { apiRequest } from "@/lib/queryClient";
@@ -9,15 +8,15 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { 
-  Cat, 
-  Sprout, 
-  Coins, 
-  ShoppingCart, 
-  TrendingUp, 
+import {
+  Cat,
+  Sprout,
+  Coins,
+  ShoppingCart,
+  TrendingUp,
   Star,
   Clock,
-  Zap
+  Zap,
 } from "lucide-react";
 
 interface Cat {
@@ -50,16 +49,16 @@ const CAT_TYPES: Cat[] = [
     baseProduction: 0.001,
     cost: 0.1,
     description: "A lazy house cat that occasionally finds loose change",
-    emoji: "🐱"
+    emoji: "🐱",
   },
   {
     id: "farm",
     name: "Farm Cat",
-    rarity: "common", 
+    rarity: "common",
     baseProduction: 0.002,
     cost: 0.25,
     description: "Works hard catching mice and earning $MEOW",
-    emoji: "🐈"
+    emoji: "🐈",
   },
   {
     id: "business",
@@ -68,7 +67,7 @@ const CAT_TYPES: Cat[] = [
     baseProduction: 0.005,
     cost: 0.75,
     description: "Wears a tiny suit and makes smart investments",
-    emoji: "🐱‍💼"
+    emoji: "🐱‍💼",
   },
   {
     id: "ninja",
@@ -77,7 +76,7 @@ const CAT_TYPES: Cat[] = [
     baseProduction: 0.008,
     cost: 1.5,
     description: "Stealthily acquires $MEOW through secret missions",
-    emoji: "🥷"
+    emoji: "🥷",
   },
   {
     id: "cyber",
@@ -86,7 +85,7 @@ const CAT_TYPES: Cat[] = [
     baseProduction: 0.015,
     cost: 3.0,
     description: "Mines cryptocurrency with advanced algorithms",
-    emoji: "🤖"
+    emoji: "🤖",
   },
   {
     id: "golden",
@@ -95,15 +94,15 @@ const CAT_TYPES: Cat[] = [
     baseProduction: 0.05,
     cost: 10.0,
     description: "A mystical cat that attracts wealth and fortune",
-    emoji: "✨"
-  }
+    emoji: "✨",
+  },
 ];
 
 export default function Farm() {
   const { user } = useAuth();
   const { toast } = useToast();
   const queryClient = useQueryClient();
-  
+
   const { data: farmData, isLoading } = useQuery({
     queryKey: ["/api/farm/data"],
     queryFn: async () => {
@@ -118,9 +117,13 @@ export default function Farm() {
       console.log("Buying cat with ID:", catId);
       const response = await apiRequest("POST", "/api/farm/buy-cat", { catId });
       if (!response.ok) {
-        const errorData = await response.json().catch(() => ({ message: 'Network error' }));
+        const errorData = await response
+          .json()
+          .catch(() => ({ message: "Network error" }));
         console.error("Buy cat error response:", errorData);
-        throw new Error(errorData.message || `HTTP error! status: ${response.status}`);
+        throw new Error(
+          errorData.message || `HTTP error! status: ${response.status}`,
+        );
       }
       return response.json();
     },
@@ -136,7 +139,8 @@ export default function Farm() {
       console.error("Buy cat error:", error);
       toast({
         title: "Error",
-        description: error.message || "Failed to purchase cat. Check console for details.",
+        description:
+          error.message || "Failed to purchase cat. Check console for details.",
         variant: "destructive",
       });
     },
@@ -166,7 +170,9 @@ export default function Farm() {
 
   const upgradeCatMutation = useMutation({
     mutationFn: async (farmCatId: string) => {
-      const response = await apiRequest("POST", "/api/farm/upgrade-cat", { farmCatId });
+      const response = await apiRequest("POST", "/api/farm/upgrade-cat", {
+        farmCatId,
+      });
       return response.json();
     },
     onSuccess: () => {
@@ -188,11 +194,16 @@ export default function Farm() {
 
   const getRarityColor = (rarity: string) => {
     switch (rarity) {
-      case "common": return "text-gray-400 border-gray-400";
-      case "rare": return "text-blue-400 border-blue-400";
-      case "epic": return "text-purple-400 border-purple-400";
-      case "legendary": return "text-yellow-400 border-yellow-400";
-      default: return "text-gray-400 border-gray-400";
+      case "common":
+        return "text-gray-400 border-gray-400";
+      case "rare":
+        return "text-blue-400 border-blue-400";
+      case "epic":
+        return "text-purple-400 border-purple-400";
+      case "legendary":
+        return "text-yellow-400 border-yellow-400";
+      default:
+        return "text-gray-400 border-gray-400";
     }
   };
 
@@ -213,7 +224,6 @@ export default function Farm() {
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
-        
         {/* Farm Stats */}
         <div className="lg:col-span-1 space-y-4">
           <Card className="crypto-gray border-crypto-pink/20">
@@ -223,32 +233,40 @@ export default function Farm() {
                 Farm Stats
               </CardTitle>
             </CardHeader>
-            <CardContent className="space-y-4">
+            <CardContent className="space-y-4 text-center">
               <div>
                 <div className="text-sm text-gray-400">Your $MEOW Balance</div>
-                <div className="text-xl font-bold crypto-gold">
+                <div className="text-xl font-bold text-crypto-pink">
                   {parseFloat(user.meowBalance || "0").toFixed(6)}
                 </div>
               </div>
-              
+
               <div>
                 <div className="text-sm text-gray-400">Unclaimed Rewards</div>
                 <div className="text-lg font-semibold crypto-green">
-                  {farmData ? parseFloat(farmData.unclaimedMeow || "0").toFixed(6) : "0.000000"}
+                  {farmData
+                    ? parseFloat(farmData.unclaimedMeow || "0").toFixed(6)
+                    : "0.000000"}
                 </div>
               </div>
-              
+
               <div>
                 <div className="text-sm text-gray-400">Production Rate</div>
-                <div className="text-lg font-semibold crypto-pink">
-                  {farmData ? `${parseFloat(farmData.totalProduction || "0").toFixed(6)}/hour` : "0.000000/hour"}
+                <div className="text-lg font-semibold bg-pink-500 text-black py-2 px-4 rounded-md">
+                  {farmData
+                    ? `${parseFloat(farmData.totalProduction || "0").toFixed(6)}/hour`
+                    : "0.000000/hour"}
                 </div>
               </div>
-              
-              <Button 
+
+              <Button
                 onClick={() => claimMutation.mutate()}
-                disabled={claimMutation.isPending || !farmData?.unclaimedMeow || parseFloat(farmData.unclaimedMeow) <= 0}
-                className="w-full bg-crypto-green hover:bg-green-500 text-black font-semibold"
+                disabled={
+                  claimMutation.isPending ||
+                  !farmData?.unclaimedMeow ||
+                  parseFloat(farmData.unclaimedMeow) <= 0
+                }
+                className="w-full bg-crypto-green hover:bg-green-500 text-white hover:text-black font-semibold"
               >
                 <Zap className="w-4 h-4 mr-2" />
                 Claim Rewards
@@ -270,15 +288,22 @@ export default function Farm() {
               <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
                 {farmData?.cats?.length > 0 ? (
                   farmData.cats.map((farmCat: any, index: number) => {
-                    const catType = CAT_TYPES.find(c => c.id === farmCat.catId);
+                    const catType = CAT_TYPES.find(
+                      (c) => c.id === farmCat.catId,
+                    );
                     if (!catType) return null;
-                    
+
                     return (
-                      <Card key={index} className="crypto-gray border-crypto-pink/20">
+                      <Card
+                        key={index}
+                        className="crypto-gray border-crypto-pink/20"
+                      >
                         <CardHeader className="pb-2">
                           <CardTitle className="flex items-center justify-between">
                             <span className="flex items-center">
-                              <span className="text-2xl mr-2">{catType.emoji}</span>
+                              <span className="text-2xl mr-2">
+                                {catType.emoji}
+                              </span>
                               {catType.name}
                             </span>
                             <Badge className={getRarityColor(catType.rarity)}>
@@ -288,22 +313,32 @@ export default function Farm() {
                         </CardHeader>
                         <CardContent className="space-y-3">
                           <div>
-                            <div className="text-sm text-gray-400">Production Rate</div>
+                            <div className="text-sm text-gray-400">
+                              Production Rate
+                            </div>
                             <div className="text-lg font-semibold crypto-green">
                               {farmCat.production.toFixed(6)} $MEOW/hour
                             </div>
                           </div>
-                          
+
                           <div>
-                            <div className="text-sm text-gray-400">Upgrade Cost</div>
-                            <div className="text-sm crypto-gold">
+                            <div className="text-sm text-gray-400">
+                              Upgrade Cost
+                            </div>
+                            <div className="text-sm text-crypto-pink">
                               {getUpgradeCost(farmCat.level)} $MEOW
                             </div>
                           </div>
-                          
-                          <Button 
-                            onClick={() => upgradeCatMutation.mutate(farmCat.id)}
-                            disabled={upgradeCatMutation.isPending || parseFloat(user.meowBalance) < parseFloat(getUpgradeCost(farmCat.level))}
+
+                          <Button
+                            onClick={() =>
+                              upgradeCatMutation.mutate(farmCat.id)
+                            }
+                            disabled={
+                              upgradeCatMutation.isPending ||
+                              parseFloat(user.meowBalance) <
+                                parseFloat(getUpgradeCost(farmCat.level))
+                            }
                             className="w-full crypto-pink hover:bg-crypto-pink-light"
                             size="sm"
                           >
@@ -317,8 +352,13 @@ export default function Farm() {
                 ) : (
                   <div className="col-span-full text-center py-12">
                     <Cat className="w-16 h-16 text-gray-400 mx-auto mb-4" />
-                    <h3 className="text-xl font-semibold text-gray-400 mb-2">No cats yet!</h3>
-                    <p className="text-gray-500">Purchase your first cat from the shop to start earning $MEOW</p>
+                    <h3 className="text-xl font-semibold text-gray-400 mb-2">
+                      No cats yet!
+                    </h3>
+                    <p className="text-gray-500">
+                      Purchase your first cat from the shop to start earning
+                      $MEOW
+                    </p>
                   </div>
                 )}
               </div>
@@ -328,7 +368,10 @@ export default function Farm() {
             <TabsContent value="shop">
               <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
                 {CAT_TYPES.map((cat) => (
-                  <Card key={cat.id} className="crypto-gray border-crypto-pink/20">
+                  <Card
+                    key={cat.id}
+                    className="crypto-gray border-crypto-pink/20"
+                  >
                     <CardHeader className="pb-2">
                       <CardTitle className="flex items-center justify-between">
                         <span className="flex items-center">
@@ -342,24 +385,29 @@ export default function Farm() {
                     </CardHeader>
                     <CardContent className="space-y-3">
                       <p className="text-sm text-gray-400">{cat.description}</p>
-                      
+
                       <div>
-                        <div className="text-sm text-gray-400">Base Production</div>
+                        <div className="text-sm text-gray-400">
+                          Base Production
+                        </div>
                         <div className="text-lg font-semibold crypto-green">
                           {cat.baseProduction.toFixed(6)} $MEOW/hour
                         </div>
                       </div>
-                      
+
                       <div>
                         <div className="text-sm text-gray-400">Cost</div>
-                        <div className="text-lg font-semibold crypto-gold">
+                        <div className="text-lg font-semibold text-crypto-pink">
                           {cat.cost.toFixed(6)} $MEOW
                         </div>
                       </div>
-                      
-                      <Button 
+
+                      <Button
                         onClick={() => buyCatMutation.mutate(cat.id)}
-                        disabled={buyCatMutation.isPending || parseFloat(user.meowBalance) < cat.cost}
+                        disabled={
+                          buyCatMutation.isPending ||
+                          parseFloat(user.meowBalance) < cat.cost
+                        }
                         className="w-full gradient-pink hover:opacity-90"
                       >
                         <ShoppingCart className="w-4 h-4 mr-2" />

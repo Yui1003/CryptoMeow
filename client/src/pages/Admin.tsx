@@ -115,7 +115,7 @@ export default function Admin() {
                         )}
                       </TableCell>
                       <TableCell>{parseFloat(user.balance).toFixed(2)} coins</TableCell>
-                      <TableCell>{parseFloat(user.meowBalance).toFixed(4)} $MEOW</TableCell>
+                      <TableCell className="text-crypto-pink">{parseFloat(user.meowBalance).toFixed(4)} $MEOW</TableCell>
                       <TableCell>
                         <Badge variant={user.isBanned ? "destructive" : "default"}>
                           {user.isBanned ? "Banned" : "Active"}
@@ -281,8 +281,8 @@ export default function Admin() {
                       <TableCell className={parseFloat(game.winAmount) > 0 ? "crypto-green" : "crypto-red"}>
                         {parseFloat(game.winAmount).toFixed(2)}
                       </TableCell>
-                      <TableCell className="crypto-gold">
-                        {parseFloat(game.meowWon).toFixed(4)}
+                      <TableCell className="text-crypto-pink">
+                        {parseFloat(game.meowWon).toFixed(4)} $MEOW
                       </TableCell>
                       <TableCell>{new Date(game.createdAt).toLocaleDateString()}</TableCell>
                     </TableRow>

@@ -85,21 +85,42 @@ export default function Layout({ children }: LayoutProps) {
 
   if (!user && !["/login", "/register"].includes(location)) {
     return (
-      <div className="min-h-screen crypto-black flex items-center justify-center">
-        <div className="text-center">
-          <div className="w-20 h-20 gradient-pink rounded-full flex items-center justify-center mx-auto mb-6">
+      <div className="relative min-h-screen background-animated flex items-center justify-center">
+        {/* Particle System */}
+        <div className="particles-container">
+          {particles.map((particle, index) => (
+            <Particle key={`particle-${particle}`} delay={index * 0.5} />
+          ))}
+          {coins.map((coin, index) => (
+            <CoinRain key={`coin-${coin}`} delay={index * 1.2} />
+          ))}
+        </div>
+
+        {/* Floating decorative elements */}
+        <div className="fixed top-20 left-10 text-crypto-pink/20 animate-float z-10">
+          <Sparkles size={32} />
+        </div>
+        <div className="fixed top-40 right-20 text-crypto-pink/20 animate-float-delayed z-10">
+          <Coins size={28} />
+        </div>
+        <div className="fixed bottom-32 left-20 text-crypto-pink/20 animate-float z-10">
+          <Cat size={24} />
+        </div>
+
+        <div className="relative z-20 text-center animate-fade-in">
+          <div className="w-20 h-20 gradient-pink rounded-full flex items-center justify-center mx-auto mb-6 animate-glow">
             <span className="text-3xl">🐱</span>
           </div>
-          <h1 className="text-4xl font-bold mb-4 gradient-pink bg-clip-text text-transparent">
+          <h1 className="text-4xl font-bold mb-4 gradient-pink bg-clip-text text-transparent animate-jackpot">
             CryptoMeow
           </h1>
-          <p className="text-gray-400 mb-8">Please log in to access the casino</p>
+          <p className="text-gray-400 mb-8 animate-pulse">Please log in to access the casino</p>
           <div className="space-x-4">
             <Link href="/login">
-              <Button className="gradient-pink hover:opacity-90">Login</Button>
+              <Button className="gradient-pink hover:opacity-90 hover-scale transition-all">Login</Button>
             </Link>
             <Link href="/register">
-              <Button variant="outline" className="border-crypto-pink text-crypto-pink hover:bg-crypto-pink hover:text-white">
+              <Button variant="outline" className="border-crypto-pink text-crypto-pink hover:bg-crypto-pink hover:text-white hover-scale transition-all">
                 Register
               </Button>
             </Link>

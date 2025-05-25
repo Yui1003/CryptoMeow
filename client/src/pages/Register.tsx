@@ -1,11 +1,54 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Link, useLocation } from "wouter";
 import { useAuth } from "@/hooks/useAuth";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { useEffect } from "react";
+import { Sparkles, Coins, Cat } from "lucide-react";
+
+// Particle component
+const Particle = ({ delay }: { delay: number }) => {
+  const [style, setStyle] = useState({});
+
+  useEffect(() => {
+    const randomX = Math.random() * 100;
+    const randomSize = Math.random() * 4 + 2;
+    const randomDuration = Math.random() * 10 + 15;
+
+    setStyle({
+      left: `${randomX}%`,
+      width: `${randomSize}px`,
+      height: `${randomSize}px`,
+      animationDelay: `${delay}s`,
+      animationDuration: `${randomDuration}s`,
+    });
+  }, [delay]);
+
+  return <div className="particle" style={style} />;
+};
+
+// Coin rain component
+const CoinRain = ({ delay }: { delay: number }) => {
+  const [style, setStyle] = useState({});
+
+  useEffect(() => {
+    const randomX = Math.random() * 100;
+    const randomDuration = Math.random() * 4 + 6;
+
+    setStyle({
+      left: `${randomX}%`,
+      animationDelay: `${delay}s`,
+      animationDuration: `${randomDuration}s`,
+    });
+  }, [delay]);
+
+  return (
+    <div className="coin-rain" style={style}>
+      💰
+    </div>
+  );
+};
 
 export default function Register() {
   const [, setLocation] = useLocation();
@@ -13,6 +56,14 @@ export default function Register() {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
+  const [particles, setParticles] = useState<number[]>([]);
+  const [coins, setCoins] = useState<number[]>([]);
+
+  // Initialize particles and coin rain
+  useEffect(() => {
+    setParticles(Array.from({ length: 20 }, (_, i) => i));
+    setCoins(Array.from({ length: 8 }, (_, i) => i));
+  }, []);
 
   useEffect(() => {
     if (user) {
@@ -37,8 +88,28 @@ export default function Register() {
   };
 
   return (
-    <div className="min-h-screen crypto-black flex items-center justify-center p-4">
-      <Card className="w-full max-w-md crypto-gray border-crypto-pink/20">
+    <div className="min-h-screen background-animated flex items-center justify-center p-4 relative">
+      {/* Particle System */}
+      <div className="particles-container">
+        {particles.map((particle, index) => (
+          <Particle key={`particle-${particle}`} delay={index * 0.5} />
+        ))}
+        {coins.map((coin, index) => (
+          <CoinRain key={`coin-${coin}`} delay={index * 1.2} />
+        ))}
+      </div>
+
+      {/* Floating decorative elements */}
+      <div className="fixed top-20 left-10 text-crypto-pink/20 animate-float z-10">
+        <Sparkles size={32} />
+      </div>
+      <div className="fixed top-40 right-20 text-crypto-pink/20 animate-float-delayed z-10">
+        <Coins size={28} />
+      </div>
+      <div className="fixed bottom-32 left-20 text-crypto-pink/20 animate-float z-10">
+        <Cat size={24} />
+      </div>
+      <Card className="w-full max-w-md crypto-gray border-crypto-pink/20 relative z-20">
         <CardHeader className="text-center">
           <div className="w-16 h-16 gradient-pink rounded-full flex items-center justify-center mx-auto mb-4">
             <span className="text-white text-2xl">🐱</span>
