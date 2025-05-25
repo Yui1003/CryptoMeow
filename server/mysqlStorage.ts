@@ -98,7 +98,8 @@ export class MySQLStorage {
     // Update jackpot based on losses
     if (parseFloat(game.winAmount || "0") === 0) {
       const currentJackpot = await this.getJackpot();
-      const jackpotIncrease = parseFloat(game.betAmount) * 0.01;
+      // 1 MEOW per 7000 coins lost (1/7000 = 0.00014286 MEOW per coin)
+      const jackpotIncrease = parseFloat(game.betAmount) * 0.00014286;
       const newAmount = (parseFloat(currentJackpot.amount) + jackpotIncrease).toFixed(8);
       await this.updateJackpot(newAmount);
     }

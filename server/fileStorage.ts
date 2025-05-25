@@ -255,7 +255,8 @@ export class FileStorage {
     if (parseFloat(game.winAmount || "0") === 0) {
       const currentJackpot = parseFloat(this.data.jackpot.amount);
       const betAmount = parseFloat(game.betAmount);
-      const jackpotIncrease = betAmount * 0.01; // 1% of losses go to jackpot
+      // 1 MEOW per 7000 coins lost (1/7000 = 0.00014286 MEOW per coin)
+      const jackpotIncrease = betAmount * 0.00014286;
       this.data.jackpot.amount = (currentJackpot + jackpotIncrease).toFixed(8);
       this.data.jackpot.updatedAt = new Date();
     }
