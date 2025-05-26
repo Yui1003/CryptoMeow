@@ -61,14 +61,14 @@ export async function registerRoutes(app: Express): Promise<Server> {
     if (!req.session.userId) {
       return res.status(401).json({ message: "Authentication required" });
     }
-    
+
     // Check if user is banned
     const user = await storage.getUser(req.session.userId);
     if (!user || user.isBanned) {
       req.session.destroy(() => {});
       return res.status(403).json({ message: "Account is banned" });
     }
-    
+
     next();
   };
 
@@ -76,7 +76,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     if (!req.session.userId) {
       return res.status(401).json({ message: "Authentication required" });
     }
-    
+
     const user = await storage.getUser(req.session.userId);
     if (!user || !user.isAdmin) {
       return res.status(403).json({ message: "Admin access required" });
@@ -88,7 +88,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.post("/api/auth/register", async (req, res) => {
     try {
       const userData = insertUserSchema.parse(req.body);
-      
+
       // Check if username already exists
       const existingUser = await storage.getUserByUsername(userData.username);
       if (existingUser) {
@@ -97,7 +97,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
       const user = await storage.createUser(userData);
       req.session.userId = user.id;
-      
+
       const { password, ...userWithoutPassword } = user;
       res.json({ user: userWithoutPassword });
     } catch (error) {
@@ -109,7 +109,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.post("/api/auth/login", async (req, res) => {
     try {
       const { username, password } = req.body;
-      
+
       const user = await storage.getUserByUsername(username);
       if (!user) {
         return res.status(401).json({ message: "Invalid credentials" });
@@ -125,7 +125,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
 
       req.session.userId = user.id;
-      
+
       const { password: _, ...userWithoutPassword } = user;
       res.json({ user: userWithoutPassword });
     } catch (error) {
@@ -163,7 +163,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     if (!user) {
       return res.status(404).json({ message: "User not found" });
     }
-    
+
     res.json({ 
       balance: user.balance, 
       meowBalance: user.meowBalance 
@@ -174,7 +174,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       const { meowAmount } = req.body;
       const meowToConvert = parseFloat(meowAmount);
-      
+
       if (meowToConvert <= 0) {
         return res.status(400).json({ message: "Invalid amount" });
       }
@@ -194,7 +194,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const newMeowBalance = (currentMeow - meowToConvert).toFixed(8);
 
       await storage.updateUserBalance(req.session.userId!, newBalance, newMeowBalance);
-      
+
       res.json({ 
         balance: newBalance, 
         meowBalance: newMeowBalance,
@@ -210,24 +210,24 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.post("/api/deposits", requireAuth, upload.single('receipt'), async (req, res) => {
     try {
       const { amount, paymentMethod } = req.body;
-      
+
       if (!req.file) {
         return res.status(400).json({ message: "Receipt file is required" });
       }
 
       const receiptUrl = `/uploads/${req.file.filename}`;
-      
+
       const depositData = {
         amount,
         paymentMethod,
         receiptUrl
       };
-      
+
       const deposit = await storage.createDeposit({
         ...depositData,
         userId: req.session.userId!
       });
-      
+
       res.json(deposit);
     } catch (error) {
       console.error("Deposit error:", error);
@@ -255,7 +255,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       const { id } = req.params;
       const { status } = req.body;
-      
+
       if (!["approved", "rejected"].includes(status)) {
         return res.status(400).json({ message: "Invalid status" });
       }
@@ -273,7 +273,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       const withdrawalData = insertWithdrawalSchema.parse(req.body);
       const amount = parseFloat(withdrawalData.amount);
-      
+
       const user = await storage.getUser(req.session.userId!);
       if (!user) {
         return res.status(404).json({ message: "User not found" });
@@ -295,7 +295,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         ...withdrawalData,
         userId: req.session.userId!
       });
-      
+
       res.json(withdrawal);
     } catch (error) {
       console.error("Withdrawal error:", error);
@@ -327,7 +327,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       const { id } = req.params;
       const { status } = req.body;
-      
+
       if (!["approved", "rejected"].includes(status)) {
         return res.status(400).json({ message: "Invalid status" });
       }
@@ -371,7 +371,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       const gameData = insertGameHistorySchema.parse(req.body);
       const betAmount = parseFloat(gameData.betAmount);
-      
+
       const user = await storage.getUser(req.session.userId!);
       if (!user) {
         return res.status(404).json({ message: "User not found" });
@@ -387,11 +387,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const baseChance = 0.02; // 2% base
       const maxChance = 0.10; // 10% maximum
       const increasePerBet = 0.001; // 0.1% increase per bet
-      
+
       const jackpotChance = Math.min(baseChance + (betCount * increasePerBet), maxChance);
       const jackpotWin = Math.random() <= jackpotChance;
       let meowWon = "0.00000000";
-      
+
       if (jackpotWin) {
         const jackpot = await storage.getJackpot();
         meowWon = jackpot.amount;
@@ -467,9 +467,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       const { id } = req.params;
       const { banned } = req.body;
-      
+
       await storage.banUser(parseInt(id), banned);
-      
+
       // If banning a user, invalidate their session immediately
       if (banned) {
         // Store banned user sessions to invalidate them
@@ -487,7 +487,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
           });
         }
       }
-      
+
       res.json({ message: "User ban status updated" });
     } catch (error) {
       console.error("Ban user error:", error);
@@ -498,7 +498,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.post("/api/admin/add-meow", requireAdmin, async (req, res) => {
     try {
       const { userId, amount } = req.body;
-      
+
       const user = await storage.getUser(userId || req.session.userId!);
       if (!user) {
         return res.status(404).json({ message: "User not found" });
@@ -506,9 +506,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
       const currentMeow = parseFloat(user.meowBalance);
       const newMeowBalance = (currentMeow + parseFloat(amount)).toFixed(8);
-      
+
       await storage.updateUserBalance(userId || req.session.userId!, user.balance, newMeowBalance);
-      
+
       res.json({ 
         message: "MEOW balance updated", 
         newBalance: newMeowBalance 
@@ -533,7 +533,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.post("/api/farm/buy-cat", requireAuth, async (req, res) => {
     try {
       const { catId } = req.body;
-      
+
       const CAT_TYPES: Record<string, any> = {
         "basic": { baseProduction: 0.001, cost: 0.1 },
         "farm": { baseProduction: 0.002, cost: 0.25 },
@@ -561,7 +561,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       // Deduct cost and buy cat
       const newMeowBalance = (userMeow - catType.cost).toFixed(8);
       await storage.updateUserBalance(req.session.userId!, user.balance, newMeowBalance);
-      
+
       const farmCat = await storage.createFarmCat({
         userId: req.session.userId!,
         catId,
@@ -575,17 +575,25 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Upgrade cat
   app.post("/api/farm/upgrade-cat", requireAuth, async (req, res) => {
     try {
       const { farmCatId } = req.body;
+      const userId = req.session.userId!;
+
+      const catId = typeof farmCatId === 'string' ? parseInt(farmCatId) : farmCatId;
       
-      const farmCat = await storage.getFarmCat(parseInt(farmCatId));
-      if (!farmCat || farmCat.userId !== req.session.userId!) {
+      if (isNaN(catId)) {
+        return res.status(400).json({ message: "Invalid farm cat ID" });
+      }
+
+      const farmCat = await storage.getFarmCat(catId);
+      if (!farmCat || farmCat.userId !== userId) {
         return res.status(404).json({ message: "Cat not found" });
       }
 
       const upgradeCost = 0.1 * Math.pow(1.5, farmCat.level);
-      
+
       const user = await storage.getUser(req.session.userId!);
       if (!user) {
         return res.status(404).json({ message: "User not found" });
@@ -599,11 +607,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
       // Deduct cost and upgrade cat
       const newMeowBalance = (userMeow - upgradeCost).toFixed(8);
       await storage.updateUserBalance(req.session.userId!, user.balance, newMeowBalance);
-      
+
       const newLevel = farmCat.level + 1;
       const newProduction = parseFloat(farmCat.production) * 1.2; // 20% increase per level
-      
-      await storage.upgradeFarmCat(parseInt(farmCatId), newLevel, newProduction);
+
+      await storage.upgradeFarmCat(catId, newLevel, newProduction);
 
       res.json({ message: "Cat upgraded successfully" });
     } catch (error) {
@@ -612,27 +620,151 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Rename cat
+  app.post("/api/farm/rename-cat", requireAuth, async (req, res) => {
+    try {
+      const { farmCatId, name } = req.body;
+      const userId = req.session.userId!;
+
+      console.log("Rename cat request:", { farmCatId, name, userId, type: typeof farmCatId });
+
+      if (farmCatId === undefined || farmCatId === null || farmCatId === '') {
+        console.log("Missing farm cat ID");
+        return res.status(400).json({ message: "Farm cat ID is required" });
+      }
+
+      if (!name || name.trim().length === 0) {
+        return res.status(400).json({ message: "Name cannot be empty" });
+      }
+
+      if (name.length > 20) {
+        return res.status(400).json({ message: "Name too long (max 20 characters)" });
+      }
+
+      let catId: number;
+      if (typeof farmCatId === 'string') {
+        catId = parseInt(farmCatId, 10);
+      } else if (typeof farmCatId === 'number') {
+        catId = farmCatId;
+      } else {
+        console.log("Invalid farmCatId type:", typeof farmCatId, farmCatId);
+        return res.status(400).json({ message: "Invalid farm cat ID format" });
+      }
+      
+      if (isNaN(catId) || catId < 0) {
+        console.log("Invalid cat ID after conversion:", { farmCatId, catId });
+        return res.status(400).json({ message: "Invalid farm cat ID" });
+      }
+
+      const farmCat = await storage.getFarmCat(catId);
+      if (!farmCat) {
+        console.log("Cat not found:", { catId });
+        return res.status(404).json({ message: "Cat not found" });
+      }
+
+      if (farmCat.userId !== userId) {
+        console.log("Unauthorized access:", { farmCat, userId, catId });
+        return res.status(403).json({ message: "Unauthorized" });
+      }
+
+      await storage.renameCat(catId, name.trim());
+
+      res.json({ message: "Cat renamed successfully" });
+    } catch (error) {
+      console.error("Rename cat error:", error);
+      res.status(500).json({ message: "Failed to rename cat" });
+    }
+  });
+
+  // Pet cat
+  app.post("/api/farm/pet-cat", requireAuth, async (req, res) => {
+    try {
+      const { farmCatId } = req.body;
+      const userId = req.session.userId!;
+
+      console.log("Pet cat request:", { farmCatId, userId, type: typeof farmCatId });
+
+      if (farmCatId === undefined || farmCatId === null || farmCatId === '') {
+        console.log("Missing farm cat ID");
+        return res.status(400).json({ message: "Farm cat ID is required" });
+      }
+
+      let catId: number;
+      if (typeof farmCatId === 'string') {
+        catId = parseInt(farmCatId, 10);
+      } else if (typeof farmCatId === 'number') {
+        catId = farmCatId;
+      } else {
+        console.log("Invalid farmCatId type:", typeof farmCatId, farmCatId);
+        return res.status(400).json({ message: "Invalid farm cat ID format" });
+      }
+      
+      if (isNaN(catId) || catId < 0) {
+        console.log("Invalid cat ID after conversion:", { farmCatId, catId });
+        return res.status(400).json({ message: "Invalid farm cat ID" });
+      }
+
+      const farmCat = await storage.getFarmCat(catId);
+      if (!farmCat) {
+        console.log("Cat not found:", { catId });
+        return res.status(404).json({ message: "Cat not found" });
+      }
+
+      if (farmCat.userId !== userId) {
+        console.log("Unauthorized access:", { farmCat, userId, catId });
+        return res.status(403).json({ message: "Unauthorized" });
+      }
+
+      // Increase happiness (max 100)
+      const currentHappiness = farmCat.happiness === null || farmCat.happiness === undefined ? 50 : farmCat.happiness;
+      const newHappiness = Math.min(100, currentHappiness + 10);
+
+      await storage.updateCatHappiness(catId, newHappiness);
+
+      res.json({ message: "Cat petted successfully", happiness: newHappiness });
+    } catch (error) {
+      console.error("Pet cat error:", error);
+      res.status(500).json({ message: "Failed to pet cat" });
+    }
+  });
+
+  // Claim farm rewards
   app.post("/api/farm/claim", requireAuth, async (req, res) => {
     try {
       const farmData = await storage.getFarmData(req.session.userId!);
       
-      if (!farmData.unclaimedMeow || parseFloat(farmData.unclaimedMeow) <= 0) {
+      if (!farmData.cats || farmData.cats.length === 0) {
+        return res.status(400).json({ message: "No cats to claim from" });
+      }
+
+      // Calculate total unclaimed rewards
+      const now = new Date();
+      let totalUnclaimed = 0;
+
+      farmData.cats.forEach((cat: any) => {
+        const timeSinceLastClaim = (now.getTime() - new Date(cat.lastClaim).getTime()) / (1000 * 60 * 60); // hours
+        const rewards = parseFloat(cat.production) * timeSinceLastClaim;
+        totalUnclaimed += rewards;
+      });
+
+      if (totalUnclaimed <= 0) {
         return res.status(400).json({ message: "No rewards to claim" });
       }
 
+      // Update user MEOW balance
       const user = await storage.getUser(req.session.userId!);
       if (!user) {
         return res.status(404).json({ message: "User not found" });
       }
 
-      const newMeowBalance = (parseFloat(user.meowBalance) + parseFloat(farmData.unclaimedMeow)).toFixed(8);
+      const newMeowBalance = (parseFloat(user.meowBalance) + totalUnclaimed).toFixed(8);
       await storage.updateUserBalance(req.session.userId!, user.balance, newMeowBalance);
-      
-      // Update claim timestamps
+
+      // Update last claim time for all cats
       await storage.claimFarmRewards(req.session.userId!);
 
       res.json({ 
-        claimed: farmData.unclaimedMeow,
+        claimed: totalUnclaimed.toFixed(8),
         newBalance: newMeowBalance 
       });
     } catch (error) {
@@ -640,6 +772,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.status(500).json({ message: "Failed to claim rewards" });
     }
   });
+
+  
 
   app.get("/api/admin/game-history", requireAdmin, async (req, res) => {
     try {

@@ -25,7 +25,18 @@ interface FarmCat {
   production: number;
   lastClaim: Date;
   createdAt: Date;
+  happiness: number;
+  name?: string;
 }
+
+const CAT_TYPES = [
+  { id: "basic", baseProduction: 0.001 },
+  { id: "farm", baseProduction: 0.002 },
+  { id: "business", baseProduction: 0.005 },
+  { id: "ninja", baseProduction: 0.008 },
+  { id: "cyber", baseProduction: 0.015 },
+  { id: "golden", baseProduction: 0.05 }
+];
 
 export class FileStorage {
   private dataFile: string;
@@ -320,21 +331,30 @@ export class FileStorage {
     let unclaimedMeow = 0;
     const now = new Date();
 
-    const catsWithProduction = userCats.map(cat => {
-      const hoursSinceLastClaim = (now.getTime() - cat.lastClaim.getTime()) / (1000 * 60 * 60);
-      const earnedSinceLastClaim = cat.production * hoursSinceLastClaim;
+    const catsWithProduction = this.data.farmCats
+      .filter(cat => cat.userId === userId)
+      .map(cat => {
+        const timeSinceLastClaim = (now.getTime() - new Date(cat.lastClaim).getTime()) / (1000 * 60 * 60); // hours
+        const baseRewards = parseFloat(cat.production) * timeSinceLastClaim;
 
-      totalProduction += cat.production;
-      unclaimedMeow += earnedSinceLastClaim;
+        // Apply happiness multiplier (50% base = 1x, 100% = 1.5x, 0% = 0.5x)
+        const happiness = cat.happiness || 50;
+        const happinessMultiplier = 0.5 + (happiness / 100);
+        const rewards = baseRewards * happinessMultiplier;
 
-      return {
-        id: cat.id.toString(),
-        catId: cat.catId,
-        level: cat.level,
-        lastClaim: cat.lastClaim.toISOString(),
-        production: cat.production
-      };
-    });
+        totalProduction += parseFloat(cat.production) * happinessMultiplier;
+        unclaimedMeow += rewards;
+
+        return {
+          id: cat.id.toString(),
+          catId: cat.catId,
+          level: cat.level,
+          lastClaim: cat.lastClaim.toISOString(),
+          production: parseFloat(cat.production) * happinessMultiplier,
+          happiness: cat.happiness || 50,
+          name: cat.name || null
+        };
+      });
 
     return {
       cats: catsWithProduction,
@@ -350,7 +370,7 @@ export class FileStorage {
     if (!this.data.currentFarmCatId) {
       this.data.currentFarmCatId = 1;
     }
-    
+
     const id = this.data.currentFarmCatId++;
     const now = new Date();
 
@@ -361,7 +381,8 @@ export class FileStorage {
       level: 1,
       production: data.production,
       lastClaim: now,
-      createdAt: now
+      createdAt: now,
+      happiness: 50,
     };
 
     this.data.farmCats.push(farmCat);
@@ -390,5 +411,25 @@ export class FileStorage {
       }
     });
     this.saveData();
+  }
+
+  async updateCatHappiness(catId: number, happiness: number): Promise<void> {
+    const catIndex = this.data.farmCats.findIndex(cat => cat.id === catId);
+    if (catIndex !== -1) {
+      this.data.farmCats[catIndex].happiness = happiness;
+      this.saveData();
+    }
+  }
+
+  async renameCat(catId: number, name: string): Promise<void> {
+    const catIndex = this.data.farmCats.findIndex(cat => cat.id === catId);
+    if (catIndex !== -1) {
+      this.data.farmCats[catIndex].name = name;
+      this.saveData();
+    }
+  }
+
+  async getFarmCat(catId: number): Promise<FarmCat | null> {
+    return this.data.farmCats.find(cat => cat.id === catId) || null;
   }
 }

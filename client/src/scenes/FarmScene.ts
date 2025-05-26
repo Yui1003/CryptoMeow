@@ -652,7 +652,7 @@ export class FarmScene extends Phaser.Scene {
     
     if (this.textures.exists(spritesheetKey)) {
       cat = this.add.sprite(x, y, spritesheetKey) as CatSprite;
-      cat.setScale(2.5); // Much larger scale for spritesheet assets
+      cat.setScale(4.0); // Much bigger scale for spritesheet assets
       console.log(`Using spritesheet texture for ${catData.catId}`);
       
       // Start the idle animation for real textures
@@ -663,7 +663,7 @@ export class FarmScene extends Phaser.Scene {
       }
     } else {
       cat = this.add.sprite(x, y, fallbackTextureKey) as CatSprite;
-      cat.setScale(1.2); // Larger scale for fallback graphics
+      cat.setScale(1.8); // Bigger scale for fallback graphics
       console.log(`Using fallback texture for ${catData.catId} - spritesheet ${spritesheetKey} not found`);
     }
     
@@ -679,7 +679,8 @@ export class FarmScene extends Phaser.Scene {
     this.createCatAccessories(x, y, catData.catId);
     
     // Add name tag with better styling and attach it to the cat
-    const nameText = this.add.text(x, y - 120, `${catData.catId.toUpperCase()}\nLevel ${catData.level}`, {
+    const displayName = catData.name || catData.catId.toUpperCase();
+    const nameText = this.add.text(x, y - 120, `${displayName}\nLevel ${catData.level}`, {
       fontSize: '16px',
       color: '#ffffff',
       align: 'center',
@@ -722,58 +723,61 @@ export class FarmScene extends Phaser.Scene {
   }
 
   private createCatAccessories(x: number, y: number, catId: string) {
-    // Create bed - use real texture if available, otherwise enhanced graphics
+    console.log(`Creating accessories for cat at ${x}, ${y}`);
+    
+    // Create bed - use real texture if available, otherwise fallback graphics
     if (this.textures.exists('cat_bed')) {
-      const bed = this.add.image(x - 80, y + 90, 'cat_bed');
-      bed.setScale(2.0); // Much larger scale for visibility
-      bed.setDepth(5);
-      console.log('Created cat bed with real texture');
+      const bed = this.add.image(x - 80, y + 85, 'cat_bed');
+      bed.setScale(1.0);
+      bed.setDepth(6);
+      bed.setVisible(true);
+      console.log('Added real cat bed texture');
     } else {
-      console.log('Creating fallback cat bed graphics');
       const bedGraphics = this.add.graphics();
       bedGraphics.fillStyle(0x4169E1);
       bedGraphics.fillRoundedRect(x - 120, y + 60, 80, 50, 10);
       bedGraphics.fillStyle(0x87CEEB);
       bedGraphics.fillRoundedRect(x - 110, y + 70, 60, 30, 8);
-      // Add pillow
       bedGraphics.fillStyle(0xFFFFFF);
       bedGraphics.fillCircle(x - 80, y + 75, 15);
       bedGraphics.setDepth(5);
+      bedGraphics.setVisible(true);
+      console.log('Added fallback cat bed graphics');
     }
     
-    // Create bowls - use real texture if available, otherwise enhanced graphics
+    // Create bowls - use real texture if available, otherwise fallback graphics
     if (this.textures.exists('cat_bowls')) {
-      const bowls = this.add.image(x + 80, y + 90, 'cat_bowls');
-      bowls.setScale(2.0); // Much larger scale for visibility
-      bowls.setDepth(5);
-      console.log('Created cat bowls with real texture');
+      const bowls = this.add.image(x + 80, y + 85, 'cat_bowls');
+      bowls.setScale(1.0);
+      bowls.setDepth(6);
+      bowls.setVisible(true);
+      console.log('Added real cat bowls texture');
     } else {
-      console.log('Creating fallback cat bowls graphics');
       const bowlGraphics = this.add.graphics();
-      // Food bowl
       bowlGraphics.fillStyle(0x808080);
       bowlGraphics.fillCircle(x + 60, y + 85, 20);
       bowlGraphics.fillStyle(0x8B4513);
       bowlGraphics.fillCircle(x + 60, y + 85, 16);
-      // Water bowl
       bowlGraphics.fillStyle(0x808080);
       bowlGraphics.fillCircle(x + 100, y + 85, 20);
       bowlGraphics.fillStyle(0x4169E1);
       bowlGraphics.fillCircle(x + 100, y + 85, 16);
       bowlGraphics.setDepth(5);
+      bowlGraphics.setVisible(true);
+      console.log('Added fallback cat bowls graphics');
     }
     
-    // Add random cat toys for variety - much larger and more visible
+    // Create toy
     const toys = ['blue_ball', 'orange_ball', 'pink_ball', 'mouse_toy'];
     const randomToy = toys[Math.floor(Math.random() * toys.length)];
     
     if (this.textures.exists(randomToy)) {
       const toy = this.add.image(x + 120, y + 40, randomToy);
-      toy.setScale(1.5); // Much larger scale for visibility
-      toy.setDepth(5);
-      console.log(`Created toy with real texture: ${randomToy}`);
+      toy.setScale(0.8);
+      toy.setDepth(6);
+      toy.setVisible(true);
+      console.log(`Added real toy texture: ${randomToy}`);
       
-      // Add a subtle bounce animation to the toy
       this.tweens.add({
         targets: toy,
         y: toy.y - 15,
@@ -783,9 +787,7 @@ export class FarmScene extends Phaser.Scene {
         ease: 'Sine.easeInOut'
       });
     } else {
-      console.log(`Creating fallback toy graphics for: ${randomToy}`);
       // Create fallback toy graphics
-      const toyGraphics = this.add.graphics();
       const toyColors = {
         'blue_ball': 0x0000FF,
         'orange_ball': 0xFF8C00,
@@ -794,31 +796,30 @@ export class FarmScene extends Phaser.Scene {
       };
       
       const color = toyColors[randomToy as keyof typeof toyColors] || 0xFF69B4;
+      const toyGraphics = this.add.graphics();
       
       if (randomToy === 'mouse_toy') {
-        // Draw a simple mouse shape
         toyGraphics.fillStyle(color);
         toyGraphics.fillEllipse(x + 120, y + 40, 25, 15);
-        toyGraphics.fillCircle(x + 135, y + 40, 8); // head
-        toyGraphics.fillCircle(x + 145, y + 35, 3); // ear
-        toyGraphics.fillCircle(x + 145, y + 45, 3); // ear
-        // Add a tail
+        toyGraphics.fillCircle(x + 135, y + 40, 8);
+        toyGraphics.fillCircle(x + 145, y + 35, 3);
+        toyGraphics.fillCircle(x + 145, y + 45, 3);
         toyGraphics.lineStyle(3, color);
         toyGraphics.beginPath();
         toyGraphics.moveTo(x + 105, y + 40);
-        toyGraphics.quadraticCurveTo(x + 90, y + 30, x + 85, y + 45);
+        toyGraphics.lineTo(x + 90, y + 30);
+        toyGraphics.lineTo(x + 85, y + 45);
         toyGraphics.strokePath();
       } else {
-        // Draw a ball
         toyGraphics.fillStyle(color);
         toyGraphics.fillCircle(x + 120, y + 40, 15);
         toyGraphics.fillStyle(0xFFFFFF);
-        toyGraphics.fillCircle(x + 115, y + 35, 5); // highlight
+        toyGraphics.fillCircle(x + 115, y + 35, 5);
       }
-      
       toyGraphics.setDepth(5);
+      toyGraphics.setVisible(true);
+      console.log(`Added fallback toy graphics: ${randomToy}`);
       
-      // Add bounce animation to fallback toy too
       this.tweens.add({
         targets: toyGraphics,
         y: toyGraphics.y - 15,
@@ -828,6 +829,8 @@ export class FarmScene extends Phaser.Scene {
         ease: 'Sine.easeInOut'
       });
     }
+    
+    console.log(`Created accessories for ${catId} cat`);
   }
 
   private createUpgradeEffect(cat: CatSprite) {

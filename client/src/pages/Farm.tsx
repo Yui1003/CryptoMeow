@@ -45,6 +45,8 @@ interface FarmData {
     level: number;
     lastClaim: string;
     production: number;
+    happiness?: number;
+    name?: string;
   }>;
   totalProduction: number;
   unclaimedMeow: number;
@@ -126,6 +128,7 @@ export default function Farm() {
   const [lastUpdateTime, setLastUpdateTime] = useState(Date.now());
   const [showCatDialog, setShowCatDialog] = useState(false);
   const [selectedCat, setSelectedCat] = useState<any>(null);
+  const [newCatName, setNewCatName] = useState("");
 
   useEffect(() => {
     if (farmData) {
@@ -231,6 +234,68 @@ export default function Farm() {
     },
   });
 
+  const petCatMutation = useMutation({
+    mutationFn: async (farmCatId: string | number) => {
+      console.log('Pet cat mutation called with ID:', farmCatId, typeof farmCatId);
+      const response = await apiRequest("POST", "/api/farm/pet-cat", {
+        farmCatId: farmCatId.toString(),
+      });
+      if (!response.ok) {
+        const errorText = await response.text();
+        console.error('Pet cat error response:', errorText);
+        throw new Error(`Failed to pet cat: ${response.status}`);
+      }
+      return response.json();
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/farm/data"] });
+      toast({
+        title: "Purr! 😸",
+        description: "Your cat is happier now!",
+      });
+    },
+    onError: (error: any) => {
+      console.error('Pet cat mutation error:', error);
+      toast({
+        title: "Error",
+        description: error.message || "Failed to pet cat",
+        variant: "destructive",
+      });
+    },
+  });
+
+  const renameCatMutation = useMutation({
+    mutationFn: async ({ farmCatId, name }: { farmCatId: string | number; name: string }) => {
+      console.log('Rename cat mutation called with:', { farmCatId, name, type: typeof farmCatId });
+      const response = await apiRequest("POST", "/api/farm/rename-cat", {
+        farmCatId: farmCatId.toString(),
+        name,
+      });
+      if (!response.ok) {
+        const errorText = await response.text();
+        console.error('Rename cat error response:', errorText);
+        throw new Error(`Failed to rename cat: ${response.status}`);
+      }
+      return response.json();
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/farm/data"] });
+      setShowCatDialog(false);
+      toast({
+        title: "Renamed!",
+        description: "Cat renamed successfully!",
+      });
+    },
+    onError: (error: any) => {
+      console.error('Rename cat mutation error:', error);
+      toast({
+        title: "Error",
+        description: error.message || "Failed to rename cat",
+        variant: "destructive",
+      });
+    },
+  });
+
   const getRarityColor = (rarity: string) => {
     switch (rarity) {
       case "common":
@@ -255,7 +320,9 @@ export default function Farm() {
   };
 
   const handleCatClick = (catData: any) => {
+    console.log('Setting selected cat:', catData);
     setSelectedCat(catData);
+    setNewCatName(catData.name || "");
     setShowCatDialog(true);
   };
 
@@ -318,6 +385,22 @@ export default function Farm() {
               </Button>
             </CardContent>
           </Card>
+
+          {/* How to Play Instructions */}
+          <Card className="crypto-gray border-crypto-pink/20">
+            <CardContent className="p-3">
+              <div className="text-center">
+                <p className="text-sm text-gray-300 mb-2">
+                  🎮 <strong>How to Play:</strong> Buy cats from the shop • Click cats to upgrade, pet, or rename them • Cats automatically earn $MEOW over time • Happy cats produce more!
+                </p>
+                <div className="flex justify-center gap-3 text-xs text-gray-400">
+                  <span>🐾 Pet = +Happiness</span>
+                  <span>⬆️ Upgrade = +Production</span>
+                  <span>💰 Claim = Collect earnings</span>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
         </div>
 
         {/* Main Content */}
@@ -347,7 +430,14 @@ export default function Farm() {
                           console.log('Cat clicked in Farm component:', catData);
                           const catType = CAT_TYPES.find((c) => c.id === catData.catId);
                           if (catType) {
-                            setSelectedCat({ ...catData, ...catType });
+                            // Ensure we have the correct ID format
+                            const processedCatData = {
+                              ...catData,
+                              id: catData.id ? catData.id.toString() : catData.id,
+                              ...catType
+                            };
+                            setSelectedCat(processedCatData);
+                            setNewCatName(catData.name || catType.name);
                             setShowCatDialog(true);
                           }
                         }}
@@ -421,23 +511,7 @@ export default function Farm() {
                       </div>
                     </div>
 
-                    {/* Instructions */}
-                    <div className="absolute bottom-4 left-4 right-4 z-10">
-                      <Card className="crypto-gray border-crypto-pink/20 backdrop-blur-sm bg-opacity-90">
-                        <CardContent className="p-3">
-                          <div className="text-center">
-                            <p className="text-sm text-gray-300 mb-2">
-                              🎮 <strong>How to Play:</strong> Click on cats to upgrade them • Watch them work and earn $MEOW • Buy new cats from the shop
-                            </p>
-                            <div className="flex justify-center gap-2 text-xs text-gray-400">
-                              <span>🐱 = Working</span>
-                              <span>💰 = Earning</span>
-                              <span>✨ = Upgraded</span>
-                            </div>
-                          </div>
-                        </CardContent>
-                      </Card>
-                    </div>
+                    
                   </CardContent>
                 </Card>
               </div>
@@ -595,17 +669,59 @@ export default function Farm() {
                 {selectedCat?.catId === 'cyber' && '🤖'}
                 {selectedCat?.catId === 'golden' && '✨'}
               </span>
-              {selectedCat?.catId?.toUpperCase()} Cat
+              {selectedCat?.name || `${selectedCat?.catId?.toUpperCase()} Cat`}
             </DialogTitle>
           </DialogHeader>
 
           {selectedCat && (
             <div className="space-y-4">
-              <div className="grid grid-cols-2 gap-4">
+              {/* Cat Name */}
+              <div>
+                <label className="text-sm text-gray-400">Cat Name</label>
+                <div className="flex gap-2">
+                  <input
+                    type="text"
+                    value={newCatName}
+                    onChange={(e) => setNewCatName(e.target.value)}
+                    className="flex-1 px-3 py-2 bg-gray-800 border border-gray-600 rounded-md text-white"
+                    placeholder="Enter cat name..."
+                  />
+                  <Button
+                    onClick={() => {
+                      if (newCatName.trim() && selectedCat?.id) {
+                        console.log('Renaming cat with ID:', selectedCat.id, typeof selectedCat.id, 'to name:', newCatName.trim());
+                        renameCatMutation.mutate({ 
+                          farmCatId: selectedCat.id, 
+                          name: newCatName.trim() 
+                        });
+                      } else {
+                        console.error('Missing data for rename:', { 
+                          name: newCatName.trim(), 
+                          catId: selectedCat?.id,
+                          selectedCat 
+                        });
+                      }
+                    }}
+                    disabled={renameCatMutation.isPending || !newCatName.trim() || !selectedCat?.id}
+                    size="sm"
+                    className="crypto-pink hover:bg-crypto-pink-light"
+                  >
+                    Rename
+                  </Button>
+                </div>
+              </div>
+
+              <div className="grid grid-cols-3 gap-4">
                 <div>
                   <label className="text-sm text-gray-400">Level</label>
                   <div className="text-lg font-semibold text-crypto-green">
                     {selectedCat.level}
+                  </div>
+                </div>
+                <div>
+                  <label className="text-sm text-gray-400">Happiness</label>
+                  <div className="text-lg font-semibold text-crypto-gold">
+                    {selectedCat.happiness || 50}%
                   </div>
                 </div>
                 <div>
@@ -623,23 +739,45 @@ export default function Farm() {
                 </div>
               </div>
 
-              <Button
-                onClick={() => {
-                  upgradeCatMutation.mutate(selectedCat.id);
-                  setShowCatDialog(false);
-                }}
-                disabled={
-                  upgradeCatMutation.isPending ||
-                  parseFloat(user.meowBalance) < parseFloat(getUpgradeCost(selectedCat.level))
-                }
-                className="w-full gradient-pink hover:opacity-90"
-              >
-                <TrendingUp className="w-4 h-4 mr-2" />
-                Upgrade Cat ({getUpgradeCost(selectedCat.level)} $MEOW)
-              </Button>
+              {/* Action Buttons */}
+              <div className="flex gap-2">
+                <Button
+                  onClick={() => {
+                    if (selectedCat?.id) {
+                      console.log('Petting cat with ID:', selectedCat.id, typeof selectedCat.id);
+                      petCatMutation.mutate(selectedCat.id);
+                    } else {
+                      console.error('No cat ID available for petting:', selectedCat);
+                    }
+                  }}
+                  disabled={petCatMutation.isPending || !selectedCat?.id}
+                  className="flex-1 bg-crypto-gold hover:bg-yellow-500 text-black"
+                >
+                  <span className="mr-2">🐾</span>
+                  Pet Cat
+                </Button>
 
-              <div className="text-xs text-gray-500 mt-2">
-                Click on cats in the farm to interact with them!
+                <Button
+                  onClick={() => {
+                    if (selectedCat?.id) {
+                      upgradeCatMutation.mutate(selectedCat.id);
+                      setShowCatDialog(false);
+                    }
+                  }}
+                  disabled={
+                    upgradeCatMutation.isPending ||
+                    !selectedCat?.id ||
+                    parseFloat(user.meowBalance) < parseFloat(getUpgradeCost(selectedCat.level))
+                  }
+                  className="flex-1 gradient-pink hover:opacity-90"
+                >
+                  <TrendingUp className="w-4 h-4 mr-2" />
+                  Upgrade
+                </Button>
+              </div>
+
+              <div className="text-xs text-gray-500 mt-2 text-center">
+                💡 Pet your cats to increase their happiness and boost production!
               </div>
             </div>
           )}
