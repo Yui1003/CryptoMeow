@@ -282,9 +282,9 @@ export default function Deposit() {
                     GCash & Maya
                   </h4>
                   <p className="text-xs text-gray-400 ml-5">
-                    Send to: 09XX-XXX-XXXX<br/>
+                    Send to: 0999-791-4791<br/>
                     Account Name: CryptoMeow Casino<br/>
-                    Reference: Your username
+                    Reference: JO****E A.
                   </p>
                 </div>
                 <div>

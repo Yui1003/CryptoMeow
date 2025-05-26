@@ -37,15 +37,24 @@ export default function Admin() {
 
   const { data: deposits = [] } = useQuery<Deposit[]>({
     queryKey: ["/api/deposits"],
+    refetchInterval: 5000, // Refetch every 5 seconds
   });
 
   const { data: withdrawals = [] } = useQuery<Withdrawal[]>({
     queryKey: ["/api/withdrawals"],
+    refetchInterval: 5000, // Refetch every 5 seconds
   });
 
   const { data: gameHistory = [] } = useQuery<GameHistory[]>({
     queryKey: ["/api/admin/game-history"],
+    refetchInterval: 10000, // Refetch every 10 seconds
   });
+
+  // Helper function to get username by user ID
+  const getUsernameById = (userId: number) => {
+    const user = users.find(u => u.id === userId);
+    return user?.username || `User ${userId}`;
+  };
 
   const banUserMutation = useMutation({
     mutationFn: async ({ userId, banned }: { userId: number; banned: boolean }) => {
@@ -71,6 +80,7 @@ export default function Admin() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/deposits"] });
       queryClient.invalidateQueries({ queryKey: ["/api/auth/me"] });
+      queryClient.invalidateQueries({ queryKey: ["/api/admin/users"] });
       toast({
         title: "Success",
         description: "Deposit status updated successfully!",
@@ -89,6 +99,7 @@ export default function Admin() {
       queryClient.invalidateQueries({ queryKey: ["/api/withdrawals"] });
       queryClient.invalidateQueries({ queryKey: ["/api/withdrawals/user"] });
       queryClient.invalidateQueries({ queryKey: ["/api/auth/me"] });
+      queryClient.invalidateQueries({ queryKey: ["/api/admin/users"] });
       toast({
         title: "Success",
         description: "Withdrawal status updated successfully!",
@@ -188,7 +199,12 @@ export default function Admin() {
                 <TableBody>
                   {deposits.map((deposit) => (
                     <TableRow key={deposit.id}>
-                      <TableCell>{deposit.userId}</TableCell>
+                      <TableCell>
+                        <div>
+                          <div className="font-medium">{getUsernameById(deposit.userId)}</div>
+                          <div className="text-xs text-gray-400">ID: {deposit.userId}</div>
+                        </div>
+                      </TableCell>
                       <TableCell>{parseFloat(deposit.amount).toFixed(2)} coins</TableCell>
                       <TableCell>{deposit.paymentMethod}</TableCell>
                       <TableCell>
@@ -293,7 +309,12 @@ export default function Admin() {
                 <TableBody>
                   {withdrawals.map((withdrawal) => (
                     <TableRow key={withdrawal.id}>
-                      <TableCell>{withdrawal.userId}</TableCell>
+                      <TableCell>
+                        <div>
+                          <div className="font-medium">{getUsernameById(withdrawal.userId)}</div>
+                          <div className="text-xs text-gray-400">ID: {withdrawal.userId}</div>
+                        </div>
+                      </TableCell>
                       <TableCell>{parseFloat(withdrawal.amount).toFixed(2)} coins</TableCell>
                       <TableCell>{withdrawal.platform || 'N/A'}</TableCell>
                       <TableCell>
@@ -418,7 +439,12 @@ export default function Admin() {
                 <TableBody>
                   {gameHistory.slice(0, 50).map((game) => (
                     <TableRow key={game.id}>
-                      <TableCell>{game.userId}</TableCell>
+                      <TableCell>
+                        <div>
+                          <div className="font-medium">{getUsernameById(game.userId)}</div>
+                          <div className="text-xs text-gray-400">ID: {game.userId}</div>
+                        </div>
+                      </TableCell>
                       <TableCell className="capitalize">{game.gameType}</TableCell>
                       <TableCell>{parseFloat(game.betAmount).toFixed(2)}</TableCell>
                       <TableCell className={parseFloat(game.winAmount) > 0 ? "crypto-green" : "crypto-red"}>

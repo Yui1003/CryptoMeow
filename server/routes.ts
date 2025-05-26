@@ -57,10 +57,18 @@ export async function registerRoutes(app: Express): Promise<Server> {
   }));
 
   // Auth middleware
-  const requireAuth = (req: any, res: any, next: any) => {
+  const requireAuth = async (req: any, res: any, next: any) => {
     if (!req.session.userId) {
       return res.status(401).json({ message: "Authentication required" });
     }
+    
+    // Check if user is banned
+    const user = await storage.getUser(req.session.userId);
+    if (!user || user.isBanned) {
+      req.session.destroy(() => {});
+      return res.status(403).json({ message: "Account is banned" });
+    }
+    
     next();
   };
 
