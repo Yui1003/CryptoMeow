@@ -4,7 +4,7 @@
       "username": "user1",
       "password": "$2b$10$vUYPxsJCmX7SRMw5gP.TE.7MwldCD7zFHGPykGCFP5nvcBwPQrSMi",
       "id": 2,
-      "balance": "1800.35",
+      "balance": "1824.65",
       "meowBalance": "0.00000000",
       "isAdmin": false,
       "isBanned": false,
@@ -14,8 +14,8 @@
       "id": 1,
       "username": "admin",
       "password": "$2b$10$yiQUwI1/UJh4Y01jeDNBBOSO5rNsMOnsMpHRB7BCJhLY8El7J.oUi",
-      "balance": "2500.10",
-      "meowBalance": "3.54635106",
+      "balance": "2399.10",
+      "meowBalance": "3.64763680",
       "isAdmin": true,
       "isBanned": false,
       "createdAt": "2025-05-24T19:43:45.385Z"
@@ -37,7 +37,7 @@
       "receiptUrl": "/uploads/receipt-1748199274252-319257426.jpg",
       "userId": 1,
       "id": 4,
-      "status": "pending",
+      "status": "rejected",
       "createdAt": "2025-05-25T18:54:34.257Z"
     },
     {
@@ -69,6 +69,15 @@
     }
   ],
   "withdrawals": [
+    {
+      "amount": "100",
+      "platform": "gcash",
+      "accountInfo": "{\"accountNumber\":\"09999999999\",\"accountName\":\"Maurice\"}",
+      "userId": 1,
+      "id": 7,
+      "status": "approved",
+      "createdAt": "2025-05-25T21:04:25.966Z"
+    },
     {
       "amount": "200",
       "userId": 1,
@@ -110,18 +119,74 @@
       "id": 1,
       "status": "rejected",
       "createdAt": "2025-05-25T20:29:15.423Z"
-    },
-    {
-      "amount": "100",
-      "platform": "gcash",
-      "accountInfo": "{\"accountNumber\":\"09999999999\",\"accountName\":\"Maurice\"}",
-      "userId": 1,
-      "id": 7,
-      "status": "pending",
-      "createdAt": "2025-05-25T21:04:25.966Z"
     }
   ],
   "gameHistory": [
+    {
+      "gameType": "hilo",
+      "betAmount": "1",
+      "winAmount": "3.5",
+      "serverSeed": "mb45mdzd1ana4gun6gphho2u1207oq",
+      "clientSeed": "mb45mdzdj5mamtu42ng",
+      "nonce": 2600005,
+      "result": "{\"streak\":5,\"multiplier\":3.5,\"cashedOut\":true}",
+      "meowWon": "0.00000000",
+      "userId": 2,
+      "id": 166,
+      "createdAt": "2025-05-25T21:12:21.456Z"
+    },
+    {
+      "gameType": "slots",
+      "betAmount": "1",
+      "winAmount": "0",
+      "serverSeed": "mb45m7wi3t4e34kt7cbp6h049mks9b",
+      "clientSeed": "mb45m7widfaj8hnol1",
+      "nonce": 682849,
+      "result": "{\"symbolIndices\":[2,3,4],\"multiplier\":0,\"isWin\":false,\"winType\":\"No match\"}",
+      "meowWon": "0.00000000",
+      "userId": 2,
+      "id": 165,
+      "createdAt": "2025-05-25T21:11:57.873Z"
+    },
+    {
+      "gameType": "slots",
+      "betAmount": "1",
+      "winAmount": "8",
+      "serverSeed": "mb45m4uw2bvj41dwarzko1gw0fh6n",
+      "clientSeed": "mb45m4uwg9a3ws4fnq6",
+      "nonce": 167186,
+      "result": "{\"symbolIndices\":[0,4,4],\"multiplier\":8,\"isWin\":true,\"winType\":\"2 of a kind\"}",
+      "meowWon": "0.00000000",
+      "userId": 2,
+      "id": 164,
+      "createdAt": "2025-05-25T21:11:53.936Z"
+    },
+    {
+      "gameType": "slots",
+      "betAmount": "1",
+      "winAmount": "15",
+      "serverSeed": "mb45m0r11i9rwzl9sq3mot8c3t8zwn",
+      "clientSeed": "mb45m0r1m0by7tqm9qh",
+      "nonce": 26375,
+      "result": "{\"symbolIndices\":[5,5,5],\"multiplier\":15,\"isWin\":true,\"winType\":\"3 of a kind\"}",
+      "meowWon": "0.00000000",
+      "userId": 2,
+      "id": 163,
+      "createdAt": "2025-05-25T21:11:48.619Z"
+    },
+    {
+      "gameType": "mines",
+      "betAmount": "1",
+      "winAmount": "2.8",
+      "serverSeed": "mb45livl7sie20vcu66w5fnxo3c7tk",
+      "clientSeed": "mb45livlqchtq2b1jr",
+      "nonce": 5,
+      "result": "{\"revealedCount\":4,\"multiplier\":2.8,\"cashedOut\":true}",
+      "meowWon": "0.00000000",
+      "userId": 2,
+      "id": 162,
+      "createdAt": "2025-05-25T21:11:26.695Z"
+    },
     {
       "gameType": "slots",
       "betAmount": "1",
@@ -2214,19 +2279,32 @@
       "userId": 2,
       "id": 1,
       "createdAt": "2025-05-24T19:44:29.073Z"
+    },
+    {
+      "gameType": "dice",
+      "betAmount": "1",
+      "winAmount": "0",
+      "serverSeed": "mb4oef0rrybznq5k20gt32bsgqcaf",
+      "clientSeed": "mb4oef0rzwt8och45ja",
+      "nonce": 1748239063948,
+      "result": "{\"roll\":18,\"gameMode\":\"over\",\"target\":50,\"multiplier\":1.96,\"won\":false}",
+      "meowWon": "0.10128574",
+      "userId": 1,
+      "id": 167,
+      "createdAt": "2025-05-26T05:57:45.963Z"
     }
   ],
   "jackpot": {
     "id": 1,
-    "amount": "0.10114288",
+    "amount": "0.10014286",
     "lastWinnerId": 1,
-    "lastWonAt": "2025-05-25T20:26:36.304Z",
-    "updatedAt": "2025-05-25T20:27:06.106Z"
+    "lastWonAt": "2025-05-26T05:57:45.960Z",
+    "updatedAt": "2025-05-26T05:57:45.963Z"
   },
   "currentUserId": 3,
   "currentDepositId": 6,
   "currentWithdrawalId": 8,
-  "currentGameHistoryId": 162,
+  "currentGameHistoryId": 168,
   "farmCats": [
     {
       "id": 1,

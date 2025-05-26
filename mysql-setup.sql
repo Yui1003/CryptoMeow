@@ -1,94 +1,218 @@
--- CryptoMeow MySQL Database Setup for XAMPP
--- Run this in phpMyAdmin or MySQL command line
+-- phpMyAdmin SQL Dump
+-- version 5.2.1
+-- https://www.phpmyadmin.net/
+--
+-- Host: 127.0.0.1
+-- Generation Time: May 26, 2025 at 07:58 AM
+-- Server version: 10.4.32-MariaDB
+-- PHP Version: 8.2.12
 
-CREATE DATABASE IF NOT EXISTS cryptomeow;
-USE cryptomeow;
+SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
+START TRANSACTION;
+SET time_zone = "+00:00";
 
--- Users table
-CREATE TABLE users (
-    id INT AUTO_INCREMENT PRIMARY KEY,
-    username VARCHAR(255) UNIQUE NOT NULL,
-    password VARCHAR(255) NOT NULL,
-    balance DECIMAL(15,8) DEFAULT 1000.00000000,
-    meow_balance DECIMAL(15,8) DEFAULT 1.00000000,
-    is_admin BOOLEAN DEFAULT FALSE,
-    is_banned BOOLEAN DEFAULT FALSE,
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-);
 
--- Deposits table
-CREATE TABLE deposits (
-    id INT AUTO_INCREMENT PRIMARY KEY,
-    user_id INT NOT NULL,
-    amount DECIMAL(15,8) NOT NULL,
-    status VARCHAR(50) DEFAULT 'pending',
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    FOREIGN KEY (user_id) REFERENCES users(id)
-);
+/*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
+/*!40101 SET @OLD_CHARACTER_SET_RESULTS=@@CHARACTER_SET_RESULTS */;
+/*!40101 SET @OLD_COLLATION_CONNECTION=@@COLLATION_CONNECTION */;
+/*!40101 SET NAMES utf8mb4 */;
 
--- Withdrawals table
-CREATE TABLE withdrawals (
-    id INT AUTO_INCREMENT PRIMARY KEY,
-    user_id INT NOT NULL,
-    amount DECIMAL(15,8) NOT NULL,
-    status VARCHAR(50) DEFAULT 'pending',
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    FOREIGN KEY (user_id) REFERENCES users(id)
-);
+--
+-- Database: `cryptomeow`
+--
 
--- Game history table
-CREATE TABLE game_history (
-    id INT AUTO_INCREMENT PRIMARY KEY,
-    user_id INT NOT NULL,
-    game_type VARCHAR(50) NOT NULL,
-    bet_amount DECIMAL(15,8) NOT NULL,
-    win_amount DECIMAL(15,8) DEFAULT 0,
-    result TEXT,
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    FOREIGN KEY (user_id) REFERENCES users(id)
-);
+-- --------------------------------------------------------
 
--- Farm cats table
-CREATE TABLE IF NOT EXISTS farm_cats (
-    id INT AUTO_INCREMENT PRIMARY KEY,
-    user_id INT NOT NULL,
-    cat_id VARCHAR(50) NOT NULL,
-    level INT DEFAULT 1,
-    production DECIMAL(15,8) NOT NULL,
-    last_claim TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    FOREIGN KEY (user_id) REFERENCES users(id)
-);
+--
+-- Table structure for table `deposits`
+--
 
--- Jackpot table
-CREATE TABLE jackpot (
-    id INT AUTO_INCREMENT PRIMARY KEY,
-    amount DECIMAL(15,8) DEFAULT 0.10000000,
-    last_winner_id INT,
-    last_won_at TIMESTAMP,
-    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    FOREIGN KEY (last_winner_id) REFERENCES users(id)
-);
+CREATE TABLE `deposits` (
+  `id` int(11) NOT NULL,
+  `user_id` int(11) NOT NULL,
+  `amount` decimal(15,8) NOT NULL,
+  `status` varchar(50) DEFAULT 'pending',
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
--- Jackpot table
-CREATE TABLE jackpot (
-    id INT AUTO_INCREMENT PRIMARY KEY,
-    amount DECIMAL(15,8) DEFAULT 0.10000000,
-    last_winner_id INT NULL,
-    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-    FOREIGN KEY (last_winner_id) REFERENCES users(id)
-);
+-- --------------------------------------------------------
 
--- Insert admin user (password: admin1234)
-INSERT INTO users (username, password, balance, meow_balance, is_admin) 
-VALUES ('admin', '$2b$10$rGJ3gI7YcUKOHJKmOQwjXuq8c1ZhQjWgO9XKpP8jY9MNdQ7Zs3QXS', 10000.00, 100.00000000, TRUE)
-ON DUPLICATE KEY UPDATE meow_balance = 100.00000000;
+--
+-- Table structure for table `game_history`
+--
 
--- Insert initial jackpot
-INSERT INTO jackpot (amount) VALUES (0.10000000);
+CREATE TABLE `game_history` (
+  `id` int(11) NOT NULL,
+  `user_id` int(11) NOT NULL,
+  `game_type` varchar(50) NOT NULL,
+  `bet_amount` decimal(15,8) NOT NULL,
+  `win_amount` decimal(15,8) DEFAULT 0.00000000,
+  `result` text DEFAULT NULL,
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
+  `nonce` bigint(20) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
--- Create indexes for better performance
-CREATE INDEX idx_users_username ON users(username);
-CREATE INDEX idx_deposits_user_id ON deposits(user_id);
-CREATE INDEX idx_withdrawals_user_id ON withdrawals(user_id);
-CREATE INDEX idx_game_history_user_id ON game_history(user_id);
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `jackpot`
+--
+
+CREATE TABLE `jackpot` (
+  `id` int(11) NOT NULL,
+  `amount` decimal(15,8) DEFAULT 0.10000000,
+  `last_winner_id` int(11) DEFAULT NULL,
+  `updated_at` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `jackpot`
+--
+
+INSERT INTO `jackpot` (`id`, `amount`, `last_winner_id`, `updated_at`) VALUES
+(1, 0.10000000, NULL, '2025-05-24 18:57:59');
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `users`
+--
+
+CREATE TABLE `users` (
+  `id` int(11) NOT NULL,
+  `username` varchar(255) NOT NULL,
+  `password` varchar(255) NOT NULL,
+  `balance` decimal(15,8) DEFAULT 1000.00000000,
+  `meow_balance` decimal(15,8) DEFAULT 1.00000000,
+  `is_admin` tinyint(1) DEFAULT 0,
+  `is_banned` tinyint(1) DEFAULT 0,
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `users`
+--
+
+INSERT INTO `users` (`id`, `username`, `password`, `balance`, `meow_balance`, `is_admin`, `is_banned`, `created_at`) VALUES
+(1, 'admin', '$2b$10$rGJ3gI7YcUKOHJKmOQwjXuq8c1ZhQjWgO9XKpP8jY9MNdQ7Zs3QXS', 10000.00000000, 1.00000000, 1, 0, '2025-05-24 18:57:59');
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `withdrawals`
+--
+
+CREATE TABLE `withdrawals` (
+  `id` int(11) NOT NULL,
+  `user_id` int(11) NOT NULL,
+  `amount` decimal(15,8) NOT NULL,
+  `status` varchar(50) DEFAULT 'pending',
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Indexes for dumped tables
+--
+
+--
+-- Indexes for table `deposits`
+--
+ALTER TABLE `deposits`
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `idx_deposits_user_id` (`user_id`);
+
+--
+-- Indexes for table `game_history`
+--
+ALTER TABLE `game_history`
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `idx_game_history_user_id` (`user_id`);
+
+--
+-- Indexes for table `jackpot`
+--
+ALTER TABLE `jackpot`
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `last_winner_id` (`last_winner_id`);
+
+--
+-- Indexes for table `users`
+--
+ALTER TABLE `users`
+  ADD PRIMARY KEY (`id`),
+  ADD UNIQUE KEY `username` (`username`),
+  ADD KEY `idx_users_username` (`username`);
+
+--
+-- Indexes for table `withdrawals`
+--
+ALTER TABLE `withdrawals`
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `idx_withdrawals_user_id` (`user_id`);
+
+--
+-- AUTO_INCREMENT for dumped tables
+--
+
+--
+-- AUTO_INCREMENT for table `deposits`
+--
+ALTER TABLE `deposits`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+
+--
+-- AUTO_INCREMENT for table `game_history`
+--
+ALTER TABLE `game_history`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+
+--
+-- AUTO_INCREMENT for table `jackpot`
+--
+ALTER TABLE `jackpot`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+
+--
+-- AUTO_INCREMENT for table `users`
+--
+ALTER TABLE `users`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+
+--
+-- AUTO_INCREMENT for table `withdrawals`
+--
+ALTER TABLE `withdrawals`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+
+--
+-- Constraints for dumped tables
+--
+
+--
+-- Constraints for table `deposits`
+--
+ALTER TABLE `deposits`
+  ADD CONSTRAINT `deposits_ibfk_1` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`);
+
+--
+-- Constraints for table `game_history`
+--
+ALTER TABLE `game_history`
+  ADD CONSTRAINT `game_history_ibfk_1` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`);
+
+--
+-- Constraints for table `jackpot`
+--
+ALTER TABLE `jackpot`
+  ADD CONSTRAINT `jackpot_ibfk_1` FOREIGN KEY (`last_winner_id`) REFERENCES `users` (`id`);
+
+--
+-- Constraints for table `withdrawals`
+--
+ALTER TABLE `withdrawals`
+  ADD CONSTRAINT `withdrawals_ibfk_1` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`);
+COMMIT;
+
+/*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
+/*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;
+/*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
