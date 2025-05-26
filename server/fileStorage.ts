@@ -421,13 +421,6 @@ export class FileStorage {
     }
   }
 
-  async renameCat(catId: number, name: string): Promise<void> {
-    const catIndex = this.data.farmCats.findIndex(cat => cat.id === catId);
-    if (catIndex !== -1) {
-      this.data.farmCats[catIndex].name = name;
-      this.saveData();
-    }
-  }
 
   async getFarmCat(catId: number): Promise<FarmCat | null> {
     return this.data.farmCats.find(cat => cat.id === catId) || null;

@@ -582,7 +582,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const userId = req.session.userId!;
 
       const catId = typeof farmCatId === 'string' ? parseInt(farmCatId) : farmCatId;
-      
+
       if (isNaN(catId)) {
         return res.status(400).json({ message: "Invalid farm cat ID" });
       }
@@ -620,119 +620,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // Rename cat
-  app.post("/api/farm/rename-cat", requireAuth, async (req, res) => {
-    try {
-      const { farmCatId, name } = req.body;
-      const userId = req.session.userId!;
-
-      console.log("Rename cat request:", { farmCatId, name, userId, type: typeof farmCatId });
-
-      if (farmCatId === undefined || farmCatId === null || farmCatId === '') {
-        console.log("Missing farm cat ID");
-        return res.status(400).json({ message: "Farm cat ID is required" });
-      }
-
-      if (!name || name.trim().length === 0) {
-        return res.status(400).json({ message: "Name cannot be empty" });
-      }
-
-      if (name.length > 20) {
-        return res.status(400).json({ message: "Name too long (max 20 characters)" });
-      }
-
-      let catId: number;
-      if (typeof farmCatId === 'string') {
-        catId = parseInt(farmCatId, 10);
-      } else if (typeof farmCatId === 'number') {
-        catId = farmCatId;
-      } else {
-        console.log("Invalid farmCatId type:", typeof farmCatId, farmCatId);
-        return res.status(400).json({ message: "Invalid farm cat ID format" });
-      }
-      
-      if (isNaN(catId) || catId < 0) {
-        console.log("Invalid cat ID after conversion:", { farmCatId, catId });
-        return res.status(400).json({ message: "Invalid farm cat ID" });
-      }
-
-      const farmCat = await storage.getFarmCat(catId);
-      if (!farmCat) {
-        console.log("Cat not found:", { catId });
-        return res.status(404).json({ message: "Cat not found" });
-      }
-
-      if (farmCat.userId !== userId) {
-        console.log("Unauthorized access:", { farmCat, userId, catId });
-        return res.status(403).json({ message: "Unauthorized" });
-      }
-
-      await storage.renameCat(catId, name.trim());
-
-      res.json({ message: "Cat renamed successfully" });
-    } catch (error) {
-      console.error("Rename cat error:", error);
-      res.status(500).json({ message: "Failed to rename cat" });
-    }
-  });
-
-  // Pet cat
-  app.post("/api/farm/pet-cat", requireAuth, async (req, res) => {
-    try {
-      const { farmCatId } = req.body;
-      const userId = req.session.userId!;
-
-      console.log("Pet cat request:", { farmCatId, userId, type: typeof farmCatId });
-
-      if (farmCatId === undefined || farmCatId === null || farmCatId === '') {
-        console.log("Missing farm cat ID");
-        return res.status(400).json({ message: "Farm cat ID is required" });
-      }
-
-      let catId: number;
-      if (typeof farmCatId === 'string') {
-        catId = parseInt(farmCatId, 10);
-      } else if (typeof farmCatId === 'number') {
-        catId = farmCatId;
-      } else {
-        console.log("Invalid farmCatId type:", typeof farmCatId, farmCatId);
-        return res.status(400).json({ message: "Invalid farm cat ID format" });
-      }
-      
-      if (isNaN(catId) || catId < 0) {
-        console.log("Invalid cat ID after conversion:", { farmCatId, catId });
-        return res.status(400).json({ message: "Invalid farm cat ID" });
-      }
-
-      const farmCat = await storage.getFarmCat(catId);
-      if (!farmCat) {
-        console.log("Cat not found:", { catId });
-        return res.status(404).json({ message: "Cat not found" });
-      }
-
-      if (farmCat.userId !== userId) {
-        console.log("Unauthorized access:", { farmCat, userId, catId });
-        return res.status(403).json({ message: "Unauthorized" });
-      }
-
-      // Increase happiness (max 100)
-      const currentHappiness = farmCat.happiness === null || farmCat.happiness === undefined ? 50 : farmCat.happiness;
-      const newHappiness = Math.min(100, currentHappiness + 10);
-
-      await storage.updateCatHappiness(catId, newHappiness);
-
-      res.json({ message: "Cat petted successfully", happiness: newHappiness });
-    } catch (error) {
-      console.error("Pet cat error:", error);
-      res.status(500).json({ message: "Failed to pet cat" });
-    }
-  });
-
   // Claim farm rewards
   app.post("/api/farm/claim", requireAuth, async (req, res) => {
     try {
       const farmData = await storage.getFarmData(req.session.userId!);
-      
+
       if (!farmData.cats || farmData.cats.length === 0) {
         return res.status(400).json({ message: "No cats to claim from" });
       }
@@ -773,7 +665,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  
+
 
   app.get("/api/admin/game-history", requireAdmin, async (req, res) => {
     try {

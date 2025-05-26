@@ -172,16 +172,7 @@ export class FarmScene extends Phaser.Scene {
             repeat: -1
           });
           
-          // Create happy animation with faster jump sequence
-          this.anims.create({
-            key: `${type}_happy`,
-            frames: this.anims.generateFrameNumbers(jumpSheetKey, { 
-              start: 0, 
-              end: safeJumpFrames - 1
-            }),
-            frameRate: 15,
-            repeat: 3
-          });
+          
           
           console.log(`Successfully created animations for ${type}`);
         } catch (error) {
@@ -533,12 +524,6 @@ export class FarmScene extends Phaser.Scene {
   private createCoinAnimation(cat: CatSprite) {
     const coin = this.add.sprite(cat.x, cat.y - 20, 'coin');
     
-    // Play happy animation if available
-    const happyAnimKey = `${cat.catData.catId}_happy`;
-    if (this.anims.exists(happyAnimKey)) {
-      cat.play(happyAnimKey);
-    }
-    
     // Floating coin animation
     this.tweens.add({
       targets: coin,
@@ -652,7 +637,7 @@ export class FarmScene extends Phaser.Scene {
     
     if (this.textures.exists(spritesheetKey)) {
       cat = this.add.sprite(x, y, spritesheetKey) as CatSprite;
-      cat.setScale(4.0); // Much bigger scale for spritesheet assets
+      cat.setScale(6.0); // Much bigger scale for spritesheet assets to match screenshot
       console.log(`Using spritesheet texture for ${catData.catId}`);
       
       // Start the idle animation for real textures
@@ -663,7 +648,7 @@ export class FarmScene extends Phaser.Scene {
       }
     } else {
       cat = this.add.sprite(x, y, fallbackTextureKey) as CatSprite;
-      cat.setScale(1.8); // Bigger scale for fallback graphics
+      cat.setScale(2.5); // Bigger scale for fallback graphics to match screenshot
       console.log(`Using fallback texture for ${catData.catId} - spritesheet ${spritesheetKey} not found`);
     }
     
@@ -679,7 +664,7 @@ export class FarmScene extends Phaser.Scene {
     this.createCatAccessories(x, y, catData.catId);
     
     // Add name tag with better styling and attach it to the cat
-    const displayName = catData.name || catData.catId.toUpperCase();
+    const displayName = catData.catId.toUpperCase();
     const nameText = this.add.text(x, y - 120, `${displayName}\nLevel ${catData.level}`, {
       fontSize: '16px',
       color: '#ffffff',
@@ -719,7 +704,13 @@ export class FarmScene extends Phaser.Scene {
 
   private updateCat(cat: CatSprite, catData: any) {
     cat.catData = catData;
-    // Update cat appearance based on level, etc.
+    
+    // Update the name tag with new level information
+    const nameText = (cat as any).nameText;
+    if (nameText) {
+      const displayName = catData.catId.toUpperCase();
+      nameText.setText(`${displayName}\nLevel ${catData.level}`);
+    }
   }
 
   private createCatAccessories(x: number, y: number, catId: string) {

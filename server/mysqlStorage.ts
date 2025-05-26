@@ -1,4 +1,3 @@
-
 import { users, deposits, withdrawals, gameHistory, jackpot, farmCats, type User, type InsertUser, type Deposit, type InsertDeposit, type Withdrawal, type InsertWithdrawal, type GameHistory, type InsertGameHistory, type Jackpot, type FarmCat } from "@shared/schema";
 import { db } from "../mysql-connection";
 import { eq, desc } from "drizzle-orm";
@@ -25,7 +24,7 @@ export class MySQLStorage {
       isAdmin: false,
       isBanned: false,
     });
-    
+
     const newUser = await this.getUser(result[0].insertId);
     if (!newUser) throw new Error("Failed to create user");
     return newUser;
@@ -45,7 +44,7 @@ export class MySQLStorage {
       status: "pending",
       receiptUrl: null,
     });
-    
+
     const newDeposit = await db.select().from(deposits).where(eq(deposits.id, result[0].insertId)).limit(1);
     return newDeposit[0];
   }
@@ -74,7 +73,7 @@ export class MySQLStorage {
       ...withdrawal,
       status: "pending",
     });
-    
+
     const newWithdrawal = await db.select().from(withdrawals).where(eq(withdrawals.id, result[0].insertId)).limit(1);
     return newWithdrawal[0];
   }
@@ -148,18 +147,18 @@ export class MySQLStorage {
 
   async getFarmData(userId: number): Promise<any> {
     const cats = await db.select().from(farmCats).where(eq(farmCats.userId, userId));
-    
+
     let totalProduction = 0;
     let unclaimedMeow = 0;
-    
+
     const now = new Date();
-    
+
     const catsWithRewards = cats.map(cat => {
       const timeSinceLastClaim = (now.getTime() - new Date(cat.lastClaim).getTime()) / (1000 * 60 * 60); // hours
       const rewards = parseFloat(cat.production) * timeSinceLastClaim;
       totalProduction += parseFloat(cat.production);
       unclaimedMeow += rewards;
-      
+
       return {
         id: cat.id.toString(),
         catId: cat.catId,
@@ -184,7 +183,7 @@ export class MySQLStorage {
       production: data.production.toString(),
       lastClaim: new Date(),
     });
-    
+
     const newCat = await db.select().from(farmCats).where(eq(farmCats.id, result[0].insertId)).limit(1);
     return newCat[0];
   }
