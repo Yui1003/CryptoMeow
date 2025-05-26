@@ -30,38 +30,64 @@ export class FarmScene extends Phaser.Scene {
       console.warn('Asset failed to load, using fallback:', file.key);
     });
 
-    // Load cat sprites based on actual file structure
+    // Load cat sprites as spritesheets with more appropriate frame dimensions
+    // Most cat sprites appear to be around 32x32 or 48x48 pixels per frame
+    
     // House Cat = Classical
-    this.load.image('basic_idle', 'assets/AllCats/Classical/IdleCat.png');
-    this.load.image('basic_jump', 'assets/AllCats/Classical/JumpCat.png');
+    this.load.spritesheet('basic_idle_sheet', '/assets/AllCats/Classical/IdleCat.png', { 
+      frameWidth: 32, frameHeight: 32 
+    });
+    this.load.spritesheet('basic_jump_sheet', '/assets/AllCats/Classical/JumpCat.png', { 
+      frameWidth: 32, frameHeight: 32 
+    });
     
     // Farm Cat = TigerCatFree  
-    this.load.image('farm_idle', 'assets/AllCats/TigerCatFree/IdleCatt.png');
-    this.load.image('farm_jump', 'assets/AllCats/TigerCatFree/JumpCattt.png');
+    this.load.spritesheet('farm_idle_sheet', '/assets/AllCats/TigerCatFree/IdleCat.png', { 
+      frameWidth: 32, frameHeight: 32 
+    });
+    this.load.spritesheet('farm_jump_sheet', '/assets/AllCats/TigerCatFree/JumpCat.png', { 
+      frameWidth: 32, frameHeight: 32 
+    });
     
     // Business Cat = BlackCat
-    this.load.image('business_idle', 'assets/AllCats/BlackCat/IdleCatb.png');
-    this.load.image('business_jump', 'assets/AllCats/BlackCat/JumpCabt.png');
+    this.load.spritesheet('business_idle_sheet', '/assets/AllCats/BlackCat/IdleCat.png', { 
+      frameWidth: 32, frameHeight: 32 
+    });
+    this.load.spritesheet('business_jump_sheet', '/assets/AllCats/BlackCat/JumpCat.png', { 
+      frameWidth: 32, frameHeight: 32 
+    });
     
     // Ninja Cat = BatmanCatFree
-    this.load.image('ninja_idle', 'assets/AllCats/BatmanCatFree/IdleCatt.png');
-    this.load.image('ninja_jump', 'assets/AllCats/BatmanCatFree/JumpCattt.png');
+    this.load.spritesheet('ninja_idle_sheet', '/assets/AllCats/BatmanCatFree/IdleCat.png', { 
+      frameWidth: 32, frameHeight: 32 
+    });
+    this.load.spritesheet('ninja_jump_sheet', '/assets/AllCats/BatmanCatFree/JumpCat.png', { 
+      frameWidth: 32, frameHeight: 32 
+    });
     
     // Cyber Cat = ThreeColorFree
-    this.load.image('cyber_idle', 'assets/AllCats/ThreeColorFree/IdleCatt.png');
-    this.load.image('cyber_jump', 'assets/AllCats/ThreeColorFree/JumpCattt.png');
+    this.load.spritesheet('cyber_idle_sheet', '/assets/AllCats/ThreeColorFree/IdleCat.png', { 
+      frameWidth: 32, frameHeight: 32 
+    });
+    this.load.spritesheet('cyber_jump_sheet', '/assets/AllCats/ThreeColorFree/JumpCat.png', { 
+      frameWidth: 32, frameHeight: 32 
+    });
     
-    // Golden Cat = EgyptCatFree
-    this.load.image('golden_idle', 'assets/AllCats/EgyptCatFree/IdleCatb.png');
-    this.load.image('golden_jump', 'assets/AllCats/EgyptCatFree/JumpCabt.png');
+    // Golden Cat = EgyptCatFree (note: this folder has JumpCab.png instead of JumpCat.png)
+    this.load.spritesheet('golden_idle_sheet', '/assets/AllCats/EgyptCatFree/IdleCat.png', { 
+      frameWidth: 32, frameHeight: 32 
+    });
+    this.load.spritesheet('golden_jump_sheet', '/assets/AllCats/EgyptCatFree/JumpCab.png', { 
+      frameWidth: 32, frameHeight: 32 
+    });
     
     // Load cat materials
-    this.load.image('cat_bed', 'assets/CatMaterials/CatBedBlue.png');
-    this.load.image('cat_bowls', 'assets/CatMaterials/CatBowls.png');
-    this.load.image('blue_ball', 'assets/CatMaterials/BlueBall-Sheet.png');
-    this.load.image('orange_ball', 'assets/CatMaterials/OrangeBall-Sheet.png');
-    this.load.image('pink_ball', 'assets/CatMaterials/PinkBall-Sheet.png');
-    this.load.image('mouse_toy', 'assets/CatMaterials/Mouse-Sheet.png');
+    this.load.image('cat_bed', '/assets/CatMaterials/CatBedBlue.png');
+    this.load.image('cat_bowls', '/assets/CatMaterials/CatBowls.png');
+    this.load.image('blue_ball', '/assets/CatMaterials/BlueBall-Sheet.png');
+    this.load.image('orange_ball', '/assets/CatMaterials/OrangeBall-Sheet.png');
+    this.load.image('pink_ball', '/assets/CatMaterials/PinkBall-Sheet.png');
+    this.load.image('mouse_toy', '/assets/CatMaterials/Mouse-Sheet.png');
   }
 
   
@@ -78,35 +104,86 @@ export class FarmScene extends Phaser.Scene {
     const catTypes = ['basic', 'farm', 'business', 'ninja', 'cyber', 'golden'];
     
     catTypes.forEach(type => {
-      // Only create animation if both textures exist
-      if (this.textures.exists(`${type}_idle`) && this.textures.exists(`${type}_jump`)) {
-        // Create idle animation (alternating between idle and slight bounce)
-        this.anims.create({
-          key: `${type}_idle`,
-          frames: [
-            { key: `${type}_idle` },
-            { key: `${type}_idle` },
-            { key: `${type}_idle` },
-            { key: `${type}_jump` },
-            { key: `${type}_idle` },
-            { key: `${type}_idle` }
-          ],
-          frameRate: 3,
-          repeat: -1
-        });
-        
-        // Create working animation (more active jumping)
-        this.anims.create({
-          key: `${type}_working`,
-          frames: [
-            { key: `${type}_jump` },
-            { key: `${type}_idle` },
-            { key: `${type}_jump` },
-            { key: `${type}_idle` }
-          ],
-          frameRate: 4,
-          repeat: -1
-        });
+      const idleSheetKey = `${type}_idle_sheet`;
+      const jumpSheetKey = `${type}_jump_sheet`;
+      
+      // Only create animation if both spritesheets exist
+      if (this.textures.exists(idleSheetKey) && this.textures.exists(jumpSheetKey)) {
+        try {
+          // Get the texture to determine frame count
+          const idleTexture = this.textures.get(idleSheetKey);
+          const jumpTexture = this.textures.get(jumpSheetKey);
+          
+          // Calculate frame counts (using 32px frame width now)
+          const idleFrameCount = Math.floor(idleTexture.source[0].width / 32);
+          const jumpFrameCount = Math.floor(jumpTexture.source[0].width / 32);
+          
+          console.log(`Creating animations for ${type}: idle frames=${idleFrameCount}, jump frames=${jumpFrameCount}`);
+          
+          // Ensure we have at least 1 frame
+          const safeIdleFrames = Math.max(1, idleFrameCount);
+          const safeJumpFrames = Math.max(1, jumpFrameCount);
+          
+          // Create idle animation using all frames from idle spritesheet
+          this.anims.create({
+            key: `${type}_idle`,
+            frames: this.anims.generateFrameNumbers(idleSheetKey, { 
+              start: 0, 
+              end: safeIdleFrames - 1
+            }),
+            frameRate: 8,
+            repeat: -1
+          });
+          
+          // Create jump animation using all frames from jump spritesheet
+          this.anims.create({
+            key: `${type}_jump`,
+            frames: this.anims.generateFrameNumbers(jumpSheetKey, { 
+              start: 0, 
+              end: safeJumpFrames - 1
+            }),
+            frameRate: 12,
+            repeat: -1
+          });
+          
+          // Create working animation that alternates between idle and jump
+          const workingFrames = [];
+          // Add some idle frames
+          for (let i = 0; i < Math.min(3, safeIdleFrames); i++) {
+            workingFrames.push({ key: idleSheetKey, frame: i, duration: 150 });
+          }
+          // Add jump frames
+          for (let i = 0; i < safeJumpFrames; i++) {
+            workingFrames.push({ key: jumpSheetKey, frame: i, duration: 100 });
+          }
+          // Add more idle frames
+          for (let i = 0; i < Math.min(2, safeIdleFrames); i++) {
+            workingFrames.push({ key: idleSheetKey, frame: i, duration: 200 });
+          }
+          
+          this.anims.create({
+            key: `${type}_working`,
+            frames: workingFrames,
+            repeat: -1
+          });
+          
+          // Create happy animation with faster jump sequence
+          this.anims.create({
+            key: `${type}_happy`,
+            frames: this.anims.generateFrameNumbers(jumpSheetKey, { 
+              start: 0, 
+              end: safeJumpFrames - 1
+            }),
+            frameRate: 15,
+            repeat: 3
+          });
+          
+          console.log(`Successfully created animations for ${type}`);
+        } catch (error) {
+          console.warn(`Failed to create animations for ${type}:`, error);
+        }
+      } else {
+        console.log(`Skipping animations for ${type} - textures not found`);
       }
     });
   }
@@ -329,15 +406,19 @@ export class FarmScene extends Phaser.Scene {
   private startCatWorking(cat: CatSprite) {
     cat.isWorking = true;
     
-    // Switch to working animation if available
-    const workingAnimKey = `${cat.catData.catId}_working`;
-    if (this.anims.exists(workingAnimKey)) {
-      cat.play(workingAnimKey);
+    // Switch to jump animation for working
+    const jumpAnimKey = `${cat.catData.catId}_jump`;
+    if (this.anims.exists(jumpAnimKey)) {
+      cat.play(jumpAnimKey);
+      console.log(`Cat ${cat.catData.catId} started working with jump animation`);
     }
     
-    // Move cat to a work position
-    const workX = Phaser.Math.Between(100, this.cameras.main.width - 100);
-    const workY = Phaser.Math.Between(100, this.cameras.main.height - 100);
+    // Calculate grass area bounds and keep cats within grass
+    const grassStartY = this.cameras.main.height * 0.3;
+    const workX = Phaser.Math.Between(150, this.cameras.main.width - 150);
+    const workY = Phaser.Math.Between(grassStartY + 50, this.cameras.main.height - 150);
+    
+    const nameText = (cat as any).nameText;
     
     this.tweens.add({
       targets: cat,
@@ -345,6 +426,12 @@ export class FarmScene extends Phaser.Scene {
       y: workY,
       duration: 2000,
       ease: 'Power2',
+      onUpdate: () => {
+        // Update name tag position to follow cat
+        if (nameText) {
+          nameText.setPosition(cat.x, cat.y - 80);
+        }
+      },
       onComplete: () => {
         this.createCoinAnimation(cat);
         setTimeout(() => {
@@ -353,6 +440,7 @@ export class FarmScene extends Phaser.Scene {
           const idleAnimKey = `${cat.catData.catId}_idle`;
           if (this.anims.exists(idleAnimKey)) {
             cat.play(idleAnimKey);
+            console.log(`Cat ${cat.catData.catId} returned to idle animation`);
           }
         }, 3000);
       }
@@ -361,6 +449,12 @@ export class FarmScene extends Phaser.Scene {
 
   private createCoinAnimation(cat: CatSprite) {
     const coin = this.add.sprite(cat.x, cat.y - 20, 'coin');
+    
+    // Play happy animation if available
+    const happyAnimKey = `${cat.catData.catId}_happy`;
+    if (this.anims.exists(happyAnimKey)) {
+      cat.play(happyAnimKey);
+    }
     
     // Floating coin animation
     this.tweens.add({
@@ -412,7 +506,14 @@ export class FarmScene extends Phaser.Scene {
     if (!this.farmData.cats || this.farmData.cats.length === 0) {
       console.log('No cats in farm data, clearing existing cats');
       // Clear all cats if none in data
-      this.cats.forEach(cat => cat.destroy());
+      this.cats.forEach(cat => {
+        // Destroy name text first
+        const nameText = (cat as any).nameText;
+        if (nameText) {
+          nameText.destroy();
+        }
+        cat.destroy();
+      });
       this.cats = [];
       
       // Show helpful message
@@ -431,7 +532,14 @@ export class FarmScene extends Phaser.Scene {
     // Remove excess cats
     while (this.cats.length > this.farmData.cats.length) {
       const cat = this.cats.pop();
-      if (cat) cat.destroy();
+      if (cat) {
+        // Destroy name text first
+        const nameText = (cat as any).nameText;
+        if (nameText) {
+          nameText.destroy();
+        }
+        cat.destroy();
+      }
     }
 
     // Add or update cats
@@ -449,25 +557,31 @@ export class FarmScene extends Phaser.Scene {
   private createCat(catData: any) {
     console.log('Creating cat with data:', catData);
     
+    // Calculate grass area bounds (grass starts from 30% down)
+    const grassStartY = this.cameras.main.height * 0.3;
     const x = Phaser.Math.Between(200, this.cameras.main.width - 200);
-    const y = Phaser.Math.Between(350, this.cameras.main.height - 150);
+    const y = Phaser.Math.Between(grassStartY + 50, this.cameras.main.height - 150);
     
-    // Try real texture first, fall back to generated texture
-    const realTextureKey = `${catData.catId}_idle`;
+    // Try spritesheet texture first, fall back to generated texture
+    const spritesheetKey = `${catData.catId}_idle_sheet`;
     const fallbackTextureKey = `fallback_${catData.catId}`;
     let cat: CatSprite;
     
-    if (this.textures.exists(realTextureKey)) {
-      cat = this.add.sprite(x, y, realTextureKey) as CatSprite;
-      cat.setScale(0.3); // Scale down real assets to appropriate size
-      console.log(`Using real texture for ${catData.catId}`);
+    if (this.textures.exists(spritesheetKey)) {
+      cat = this.add.sprite(x, y, spritesheetKey) as CatSprite;
+      cat.setScale(1.2); // Good scale for spritesheet assets
+      console.log(`Using spritesheet texture for ${catData.catId}`);
       
       // Start the idle animation for real textures
-      cat.play(`${catData.catId}_idle`);
+      const idleAnimKey = `${catData.catId}_idle`;
+      if (this.anims.exists(idleAnimKey)) {
+        cat.play(idleAnimKey);
+        console.log(`Playing idle animation: ${idleAnimKey}`);
+      }
     } else {
       cat = this.add.sprite(x, y, fallbackTextureKey) as CatSprite;
       cat.setScale(0.8); // Larger scale for fallback graphics
-      console.log(`Using fallback texture for ${catData.catId} - real texture ${realTextureKey} not found`);
+      console.log(`Using fallback texture for ${catData.catId} - spritesheet ${spritesheetKey} not found`);
     }
     
     cat.catData = catData;
@@ -477,7 +591,7 @@ export class FarmScene extends Phaser.Scene {
     // Create simple bed and bowls using graphics if assets don't load
     this.createCatAccessories(x, y, catData.catId);
     
-    // Add name tag with better styling
+    // Add name tag with better styling and attach it to the cat
     const nameText = this.add.text(x, y - 80, `${catData.catId.toUpperCase()}\nLevel ${catData.level}`, {
       fontSize: '14px',
       color: '#ffffff',
@@ -488,6 +602,9 @@ export class FarmScene extends Phaser.Scene {
     });
     nameText.setOrigin(0.5);
     nameText.setDepth(25);
+    
+    // Store reference to name tag on cat for movement updates
+    (cat as any).nameText = nameText;
     
     // Click handler for popup
     cat.on('pointerdown', () => {
