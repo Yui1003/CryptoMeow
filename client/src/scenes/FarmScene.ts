@@ -81,13 +81,18 @@ export class FarmScene extends Phaser.Scene {
       frameWidth: 32, frameHeight: 32 
     });
     
-    // Load cat materials
+    // Load cat materials with error handling
     this.load.image('cat_bed', '/assets/CatMaterials/CatBedBlue.png');
     this.load.image('cat_bowls', '/assets/CatMaterials/CatBowls.png');
     this.load.image('blue_ball', '/assets/CatMaterials/BlueBall-Sheet.png');
     this.load.image('orange_ball', '/assets/CatMaterials/OrangeBall-Sheet.png');
     this.load.image('pink_ball', '/assets/CatMaterials/PinkBall-Sheet.png');
     this.load.image('mouse_toy', '/assets/CatMaterials/Mouse-Sheet.png');
+    
+    // Create fallback textures for cat materials in case assets don't load
+    this.load.on('filecomplete', (key: string) => {
+      console.log(`Asset loaded successfully: ${key}`);
+    });
   }
 
   
@@ -217,6 +222,84 @@ export class FarmScene extends Phaser.Scene {
     catTypes.forEach(catId => {
       this.createFallbackCatTexture(catId);
     });
+    
+    // Create fallback textures for cat materials
+    this.createFallbackMaterialTextures();
+  }
+
+  private createFallbackMaterialTextures() {
+    console.log('Creating fallback material textures');
+    
+    // Create fallback cat bed
+    if (!this.textures.exists('cat_bed')) {
+      const bedCanvas = this.add.renderTexture(0, 0, 80, 50);
+      const bedGraphics = this.add.graphics();
+      bedGraphics.fillStyle(0x4169E1);
+      bedGraphics.fillRoundedRect(0, 0, 80, 50, 10);
+      bedGraphics.fillStyle(0x87CEEB);
+      bedGraphics.fillRoundedRect(10, 10, 60, 30, 8);
+      bedCanvas.draw(bedGraphics);
+      bedGraphics.destroy();
+      this.textures.addRenderTexture('cat_bed', bedCanvas);
+      console.log('Created fallback cat bed texture');
+    }
+    
+    // Create fallback cat bowls
+    if (!this.textures.exists('cat_bowls')) {
+      const bowlCanvas = this.add.renderTexture(0, 0, 80, 40);
+      const bowlGraphics = this.add.graphics();
+      // Food bowl
+      bowlGraphics.fillStyle(0x808080);
+      bowlGraphics.fillCircle(20, 20, 15);
+      bowlGraphics.fillStyle(0x8B4513);
+      bowlGraphics.fillCircle(20, 20, 12);
+      // Water bowl
+      bowlGraphics.fillStyle(0x808080);
+      bowlGraphics.fillCircle(60, 20, 15);
+      bowlGraphics.fillStyle(0x4169E1);
+      bowlGraphics.fillCircle(60, 20, 12);
+      bowlCanvas.draw(bowlGraphics);
+      bowlGraphics.destroy();
+      this.textures.addRenderTexture('cat_bowls', bowlCanvas);
+      console.log('Created fallback cat bowls texture');
+    }
+    
+    // Create fallback toy textures
+    const toys = [
+      { key: 'blue_ball', color: 0x0000FF },
+      { key: 'orange_ball', color: 0xFF8C00 },
+      { key: 'pink_ball', color: 0xFF69B4 }
+    ];
+    
+    toys.forEach(toy => {
+      if (!this.textures.exists(toy.key)) {
+        const toyCanvas = this.add.renderTexture(0, 0, 30, 30);
+        const toyGraphics = this.add.graphics();
+        toyGraphics.fillStyle(toy.color);
+        toyGraphics.fillCircle(15, 15, 12);
+        toyGraphics.fillStyle(0xFFFFFF);
+        toyGraphics.fillCircle(12, 12, 4);
+        toyCanvas.draw(toyGraphics);
+        toyGraphics.destroy();
+        this.textures.addRenderTexture(toy.key, toyCanvas);
+        console.log(`Created fallback texture for ${toy.key}`);
+      }
+    });
+    
+    // Create fallback mouse toy
+    if (!this.textures.exists('mouse_toy')) {
+      const mouseCanvas = this.add.renderTexture(0, 0, 40, 20);
+      const mouseGraphics = this.add.graphics();
+      mouseGraphics.fillStyle(0x808080);
+      mouseGraphics.fillEllipse(20, 10, 25, 12);
+      mouseGraphics.fillCircle(30, 10, 6);
+      mouseGraphics.fillCircle(35, 7, 2);
+      mouseGraphics.fillCircle(35, 13, 2);
+      mouseCanvas.draw(mouseGraphics);
+      mouseGraphics.destroy();
+      this.textures.addRenderTexture('mouse_toy', mouseCanvas);
+      console.log('Created fallback mouse toy texture');
+    }
   }
 
   private createFallbackCatTexture(catId: string): string {
@@ -233,68 +316,68 @@ export class FarmScene extends Phaser.Scene {
     const textureKey = `fallback_${catId}`;
     
     // Create fallback cat texture - larger and more visible
-    const catCanvas = this.add.renderTexture(0, 0, 120, 120);
+    const catCanvas = this.add.renderTexture(0, 0, 160, 160);
     const catGraphics = this.add.graphics();
     
     // Cat body (oval)
     catGraphics.fillStyle(color);
-    catGraphics.fillEllipse(60, 75, 70, 45);
+    catGraphics.fillEllipse(80, 95, 90, 60);
     
     // Cat head (circle)
-    catGraphics.fillEllipse(60, 40, 50, 40);
+    catGraphics.fillEllipse(80, 50, 65, 55);
     
     // Cat ears (triangles)
-    catGraphics.fillTriangle(35, 25, 45, 10, 50, 25);
-    catGraphics.fillTriangle(70, 25, 75, 10, 85, 25);
+    catGraphics.fillTriangle(45, 30, 60, 10, 65, 30);
+    catGraphics.fillTriangle(95, 30, 100, 10, 115, 30);
     
     // Ear insides
     catGraphics.fillStyle(0xFF69B4);
-    catGraphics.fillTriangle(40, 22, 43, 15, 47, 22);
-    catGraphics.fillTriangle(73, 22, 77, 15, 80, 22);
+    catGraphics.fillTriangle(52, 27, 57, 18, 62, 27);
+    catGraphics.fillTriangle(98, 27, 103, 18, 108, 27);
     
     // Cat eyes (circles)
     catGraphics.fillStyle(0x00FF00);
-    catGraphics.fillCircle(48, 35, 5);
-    catGraphics.fillCircle(72, 35, 5);
+    catGraphics.fillCircle(65, 45, 7);
+    catGraphics.fillCircle(95, 45, 7);
     
     // Eye pupils
     catGraphics.fillStyle(0x000000);
-    catGraphics.fillCircle(48, 35, 2);
-    catGraphics.fillCircle(72, 35, 2);
+    catGraphics.fillCircle(65, 45, 3);
+    catGraphics.fillCircle(95, 45, 3);
     
     // Cat nose (triangle)
     catGraphics.fillStyle(0xFF69B4);
-    catGraphics.fillTriangle(57, 42, 63, 42, 60, 48);
+    catGraphics.fillTriangle(75, 55, 85, 55, 80, 62);
     
     // Cat mouth
-    catGraphics.lineStyle(2, 0x000000);
+    catGraphics.lineStyle(3, 0x000000);
     catGraphics.beginPath();
-    catGraphics.moveTo(60, 48);
-    catGraphics.lineTo(55, 55);
-    catGraphics.moveTo(60, 48);
-    catGraphics.lineTo(65, 55);
+    catGraphics.moveTo(80, 62);
+    catGraphics.lineTo(72, 72);
+    catGraphics.moveTo(80, 62);
+    catGraphics.lineTo(88, 72);
     catGraphics.strokePath();
     
     // Cat whiskers
-    catGraphics.lineStyle(1, 0x000000);
+    catGraphics.lineStyle(2, 0x000000);
     catGraphics.beginPath();
-    catGraphics.moveTo(30, 40);
-    catGraphics.lineTo(45, 42);
-    catGraphics.moveTo(75, 42);
-    catGraphics.lineTo(90, 40);
-    catGraphics.moveTo(30, 48);
-    catGraphics.lineTo(45, 48);
-    catGraphics.moveTo(75, 48);
-    catGraphics.lineTo(90, 48);
+    catGraphics.moveTo(35, 50);
+    catGraphics.lineTo(58, 53);
+    catGraphics.moveTo(102, 53);
+    catGraphics.lineTo(125, 50);
+    catGraphics.moveTo(35, 62);
+    catGraphics.lineTo(58, 62);
+    catGraphics.moveTo(102, 62);
+    catGraphics.lineTo(125, 62);
     catGraphics.strokePath();
     
     // Cat tail
     catGraphics.fillStyle(color);
-    catGraphics.fillEllipse(100, 80, 25, 12);
+    catGraphics.fillEllipse(135, 100, 35, 16);
     
     // Paws
-    catGraphics.fillCircle(45, 95, 8);
-    catGraphics.fillCircle(75, 95, 8);
+    catGraphics.fillCircle(60, 125, 12);
+    catGraphics.fillCircle(100, 125, 12);
     
     catCanvas.draw(catGraphics);
     catGraphics.destroy();
@@ -429,7 +512,7 @@ export class FarmScene extends Phaser.Scene {
       onUpdate: () => {
         // Update name tag position to follow cat
         if (nameText) {
-          nameText.setPosition(cat.x, cat.y - 80);
+          nameText.setPosition(cat.x, cat.y - 120);
         }
       },
       onComplete: () => {
@@ -569,7 +652,7 @@ export class FarmScene extends Phaser.Scene {
     
     if (this.textures.exists(spritesheetKey)) {
       cat = this.add.sprite(x, y, spritesheetKey) as CatSprite;
-      cat.setScale(1.2); // Good scale for spritesheet assets
+      cat.setScale(2.5); // Much larger scale for spritesheet assets
       console.log(`Using spritesheet texture for ${catData.catId}`);
       
       // Start the idle animation for real textures
@@ -580,9 +663,13 @@ export class FarmScene extends Phaser.Scene {
       }
     } else {
       cat = this.add.sprite(x, y, fallbackTextureKey) as CatSprite;
-      cat.setScale(0.8); // Larger scale for fallback graphics
+      cat.setScale(1.2); // Larger scale for fallback graphics
       console.log(`Using fallback texture for ${catData.catId} - spritesheet ${spritesheetKey} not found`);
     }
+    
+    // Ensure cat is visible immediately
+    cat.setVisible(true);
+    cat.setAlpha(1);
     
     cat.catData = catData;
     cat.setInteractive();
@@ -592,12 +679,12 @@ export class FarmScene extends Phaser.Scene {
     this.createCatAccessories(x, y, catData.catId);
     
     // Add name tag with better styling and attach it to the cat
-    const nameText = this.add.text(x, y - 80, `${catData.catId.toUpperCase()}\nLevel ${catData.level}`, {
-      fontSize: '14px',
+    const nameText = this.add.text(x, y - 120, `${catData.catId.toUpperCase()}\nLevel ${catData.level}`, {
+      fontSize: '16px',
       color: '#ffffff',
       align: 'center',
       backgroundColor: '#000000cc',
-      padding: { x: 10, y: 6 },
+      padding: { x: 12, y: 8 },
       fontStyle: 'bold'
     });
     nameText.setOrigin(0.5);
@@ -635,50 +722,106 @@ export class FarmScene extends Phaser.Scene {
   }
 
   private createCatAccessories(x: number, y: number, catId: string) {
-    // Create bed - use real texture if available, otherwise graphics
+    // Create bed - use real texture if available, otherwise enhanced graphics
     if (this.textures.exists('cat_bed')) {
-      const bed = this.add.image(x - 30, y + 40, 'cat_bed');
-      bed.setScale(0.3);
+      const bed = this.add.image(x - 80, y + 90, 'cat_bed');
+      bed.setScale(2.0); // Much larger scale for visibility
       bed.setDepth(5);
+      console.log('Created cat bed with real texture');
     } else {
+      console.log('Creating fallback cat bed graphics');
       const bedGraphics = this.add.graphics();
       bedGraphics.fillStyle(0x4169E1);
-      bedGraphics.fillRoundedRect(x - 40, y + 30, 25, 15, 3);
+      bedGraphics.fillRoundedRect(x - 120, y + 60, 80, 50, 10);
       bedGraphics.fillStyle(0x87CEEB);
-      bedGraphics.fillRoundedRect(x - 38, y + 32, 21, 8, 2);
+      bedGraphics.fillRoundedRect(x - 110, y + 70, 60, 30, 8);
+      // Add pillow
+      bedGraphics.fillStyle(0xFFFFFF);
+      bedGraphics.fillCircle(x - 80, y + 75, 15);
       bedGraphics.setDepth(5);
     }
     
-    // Create bowls - use real texture if available, otherwise graphics
+    // Create bowls - use real texture if available, otherwise enhanced graphics
     if (this.textures.exists('cat_bowls')) {
-      const bowls = this.add.image(x + 40, y + 40, 'cat_bowls');
-      bowls.setScale(0.3);
+      const bowls = this.add.image(x + 80, y + 90, 'cat_bowls');
+      bowls.setScale(2.0); // Much larger scale for visibility
       bowls.setDepth(5);
+      console.log('Created cat bowls with real texture');
     } else {
+      console.log('Creating fallback cat bowls graphics');
       const bowlGraphics = this.add.graphics();
+      // Food bowl
       bowlGraphics.fillStyle(0x808080);
-      bowlGraphics.fillCircle(x + 35, y + 35, 8);
-      bowlGraphics.fillCircle(x + 50, y + 35, 8);
+      bowlGraphics.fillCircle(x + 60, y + 85, 20);
       bowlGraphics.fillStyle(0x8B4513);
-      bowlGraphics.fillCircle(x + 35, y + 35, 6);
+      bowlGraphics.fillCircle(x + 60, y + 85, 16);
+      // Water bowl
+      bowlGraphics.fillStyle(0x808080);
+      bowlGraphics.fillCircle(x + 100, y + 85, 20);
       bowlGraphics.fillStyle(0x4169E1);
-      bowlGraphics.fillCircle(x + 50, y + 35, 6);
+      bowlGraphics.fillCircle(x + 100, y + 85, 16);
       bowlGraphics.setDepth(5);
     }
     
-    // Add random cat toys for variety
+    // Add random cat toys for variety - much larger and more visible
     const toys = ['blue_ball', 'orange_ball', 'pink_ball', 'mouse_toy'];
     const randomToy = toys[Math.floor(Math.random() * toys.length)];
     
     if (this.textures.exists(randomToy)) {
-      const toy = this.add.image(x + 60, y + 20, randomToy);
-      toy.setScale(0.2);
+      const toy = this.add.image(x + 120, y + 40, randomToy);
+      toy.setScale(1.5); // Much larger scale for visibility
       toy.setDepth(5);
+      console.log(`Created toy with real texture: ${randomToy}`);
       
       // Add a subtle bounce animation to the toy
       this.tweens.add({
         targets: toy,
-        y: toy.y - 5,
+        y: toy.y - 15,
+        duration: 1000,
+        yoyo: true,
+        repeat: -1,
+        ease: 'Sine.easeInOut'
+      });
+    } else {
+      console.log(`Creating fallback toy graphics for: ${randomToy}`);
+      // Create fallback toy graphics
+      const toyGraphics = this.add.graphics();
+      const toyColors = {
+        'blue_ball': 0x0000FF,
+        'orange_ball': 0xFF8C00,
+        'pink_ball': 0xFF69B4,
+        'mouse_toy': 0x808080
+      };
+      
+      const color = toyColors[randomToy as keyof typeof toyColors] || 0xFF69B4;
+      
+      if (randomToy === 'mouse_toy') {
+        // Draw a simple mouse shape
+        toyGraphics.fillStyle(color);
+        toyGraphics.fillEllipse(x + 120, y + 40, 25, 15);
+        toyGraphics.fillCircle(x + 135, y + 40, 8); // head
+        toyGraphics.fillCircle(x + 145, y + 35, 3); // ear
+        toyGraphics.fillCircle(x + 145, y + 45, 3); // ear
+        // Add a tail
+        toyGraphics.lineStyle(3, color);
+        toyGraphics.beginPath();
+        toyGraphics.moveTo(x + 105, y + 40);
+        toyGraphics.quadraticCurveTo(x + 90, y + 30, x + 85, y + 45);
+        toyGraphics.strokePath();
+      } else {
+        // Draw a ball
+        toyGraphics.fillStyle(color);
+        toyGraphics.fillCircle(x + 120, y + 40, 15);
+        toyGraphics.fillStyle(0xFFFFFF);
+        toyGraphics.fillCircle(x + 115, y + 35, 5); // highlight
+      }
+      
+      toyGraphics.setDepth(5);
+      
+      // Add bounce animation to fallback toy too
+      this.tweens.add({
+        targets: toyGraphics,
+        y: toyGraphics.y - 15,
         duration: 1000,
         yoyo: true,
         repeat: -1,
