@@ -18,6 +18,17 @@ export const useAuth = () => {
         if (response.status === 401) {
           return null;
         }
+        if (response.status === 403) {
+          // User is banned, clear session and show message
+          queryClient.setQueryData(["/api/auth/me"], null);
+          queryClient.invalidateQueries();
+          toast({
+            title: "Account Banned",
+            description: "Your account has been banned. You have been logged out.",
+            variant: "destructive",
+          });
+          return null;
+        }
         if (!response.ok) {
           throw new Error("Failed to fetch user");
         }
@@ -27,6 +38,8 @@ export const useAuth = () => {
         return null;
       }
     },
+    refetchInterval: user ? 5000 : false, // Check every 5 seconds if user is logged in
+    refetchIntervalInBackground: true,
   });
 
   const loginMutation = useMutation({

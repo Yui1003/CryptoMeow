@@ -7,12 +7,7 @@ async function throwIfResNotOk(res: Response) {
   }
 }
 
-export async function apiRequest(
-  method: string,
-  url: string,
-  data?: any,
-  options?: { isFormData?: boolean }
-): Promise<Response> {
+export async function apiRequest(method: string, url: string, data?: any, options?: { isFormData?: boolean }): Promise<Response> {
   const config: RequestInit = {
     method,
     headers: options?.isFormData ? {} : {
@@ -28,8 +23,16 @@ export async function apiRequest(
   const response = await fetch(url, config);
 
   if (!response.ok) {
-    const errorData = await response.json().catch(() => ({}));
-    throw new Error(errorData.message || `HTTP error! status: ${response.status}`);
+    const errorData = await response.json().catch(() => ({ message: "Request failed" }));
+
+    // Handle ban response globally
+    if (response.status === 403 && errorData.message === "Account is banned") {
+      // Force a page reload to trigger the auth check and logout
+      window.location.reload();
+      throw new Error("Account is banned");
+    }
+
+    throw new Error(errorData.message || `HTTP ${response.status}`);
   }
 
   return response;
