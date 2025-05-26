@@ -18,6 +18,14 @@ export const useAuth = () => {
         if (response.status === 401) {
           return null;
         }
+        if (response.status === 403) {
+          toast({
+            title: "Account Banned",
+            description: "Your account has been banned.",
+            variant: "destructive",
+          });
+          return null;
+        }
         if (!response.ok) {
           throw new Error("Failed to fetch user");
         }
@@ -27,6 +35,7 @@ export const useAuth = () => {
         return null;
       }
     },
+    refetchInterval: 10000, // Check auth status every 10 seconds
   });
 
   const loginMutation = useMutation({

@@ -469,6 +469,25 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const { banned } = req.body;
       
       await storage.banUser(parseInt(id), banned);
+      
+      // If banning a user, invalidate their session immediately
+      if (banned) {
+        // Store banned user sessions to invalidate them
+        const store = req.sessionStore;
+        if (store && store.all) {
+          store.all((err: any, sessions: any) => {
+            if (!err && sessions) {
+              Object.keys(sessions).forEach((sessionId) => {
+                const session = sessions[sessionId];
+                if (session && session.userId === parseInt(id)) {
+                  store.destroy(sessionId, () => {});
+                }
+              });
+            }
+          });
+        }
+      }
+      
       res.json({ message: "User ban status updated" });
     } catch (error) {
       console.error("Ban user error:", error);
