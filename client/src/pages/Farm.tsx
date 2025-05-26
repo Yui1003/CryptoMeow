@@ -1,13 +1,14 @@
 import { useState, useEffect } from "react";
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { apiRequest } from "@/lib/queryClient";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useAuth } from "@/hooks/useAuth";
 import { useToast } from "@/hooks/use-toast";
+import { apiRequest } from "@/lib/queryClient";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import GameEngine from "@/components/GameEngine";
 import {
   Cat,
   Sprout,
@@ -17,7 +18,15 @@ import {
   Star,
   Clock,
   Zap,
+  Gamepad2,
+  BarChart3,
 } from "lucide-react";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 
 interface Cat {
   id: string;
@@ -115,6 +124,8 @@ export default function Farm() {
   const [unclaimedMeow, setUnclaimedMeow] = useState(0);
   const [baseUnclaimedMeow, setBaseUnclaimedMeow] = useState(0);
   const [lastUpdateTime, setLastUpdateTime] = useState(Date.now());
+  const [showCatDialog, setShowCatDialog] = useState(false);
+  const [selectedCat, setSelectedCat] = useState<any>(null);
 
   useEffect(() => {
     if (farmData) {
@@ -239,6 +250,15 @@ export default function Farm() {
     return (0.1 * Math.pow(1.5, level)).toFixed(6);
   };
 
+  const handleClaimRewards = () => {
+    claimMutation.mutate();
+  };
+
+  const handleCatClick = (catData: any) => {
+    setSelectedCat(catData);
+    setShowCatDialog(true);
+  };
+
   if (!user) return null;
 
   return (
@@ -302,11 +322,126 @@ export default function Farm() {
 
         {/* Main Content */}
         <div className="lg:col-span-3">
-          <Tabs defaultValue="cats" className="space-y-6">
+          <Tabs defaultValue="game" className="space-y-6">
             <TabsList className="crypto-gray border-crypto-pink/20">
-              <TabsTrigger value="cats">My Cats</TabsTrigger>
+              <TabsTrigger value="game" className="flex items-center gap-2">
+                <Gamepad2 className="w-4 h-4" />
+                Cat Village
+              </TabsTrigger>
+              <TabsTrigger value="cats" className="flex items-center gap-2">
+                <BarChart3 className="w-4 h-4" />
+                My Cats
+              </TabsTrigger>
               <TabsTrigger value="shop">Cat Shop</TabsTrigger>
             </TabsList>
+
+            {/* Game View Tab */}
+            <TabsContent value="game">
+              <div className="relative">
+                <Card className="crypto-gray border-crypto-pink/20 overflow-hidden">
+                  <CardContent className="p-0 relative">
+                    {farmData && (
+                      <GameEngine
+                        farmData={farmData}
+                        onCatClick={(catData: any) => {
+                          console.log('Cat clicked in Farm component:', catData);
+                          const catType = CAT_TYPES.find((c) => c.id === catData.catId);
+                          if (catType) {
+                            setSelectedCat({ ...catData, ...catType });
+                            setShowCatDialog(true);
+                          }
+                        }}
+                      />
+                    )}
+
+                    {/* Floating HUD */}
+                    <div className="absolute top-4 left-4 right-4 z-10">
+                      <div className="flex justify-between items-start">
+                        {/* Stats Cards */}
+                        <div className="flex gap-2">
+                          <Card className="crypto-gray border-crypto-pink/20 backdrop-blur-sm bg-opacity-90">
+                            <CardContent className="p-3">
+                              <div className="flex items-center gap-2">
+                                <Coins className="w-4 h-4 crypto-gold" />
+                                <div>
+                                  <div className="text-xs text-gray-400">Balance</div>
+                                  <div className="text-sm font-bold text-crypto-pink">
+                                    {parseFloat(user.meowBalance || "0").toFixed(4)}
+                                  </div>
+                                </div>
+                              </div>
+                            </CardContent>
+                          </Card>
+
+                          <Card className="crypto-gray border-crypto-pink/20 backdrop-blur-sm bg-opacity-90">
+                            <CardContent className="p-3">
+                              <div className="flex items-center gap-2">
+                                <TrendingUp className="w-4 h-4 crypto-green" />
+                                <div>
+                                  <div className="text-xs text-gray-400">Production</div>
+                                  <div className="text-sm font-bold crypto-green">
+                                    {farmData ? `${parseFloat(farmData.totalProduction || "0").toFixed(4)}/h` : "0/h"}
+                                  </div>
+                                </div>
+                              </div>
+                            </CardContent>
+                          </Card>
+
+                          <Card className="crypto-gray border-crypto-pink/20 backdrop-blur-sm bg-opacity-90">
+                            <CardContent className="p-3">
+                              <div className="flex items-center gap-2">
+                                <Zap className="w-4 h-4 crypto-gold" />
+                                <div>
+                                  <div className="text-xs text-gray-400">Unclaimed</div>
+                                  <div className="text-sm font-bold crypto-green">
+                                    {unclaimedMeow.toFixed(4)}
+                                  </div>
+                                </div>
+                              </div>
+                            </CardContent>
+                          </Card>
+                        </div>
+
+                        {/* Action Buttons */}
+                        <div className="flex gap-2">
+                          <Button
+                            onClick={() => claimMutation.mutate()}
+                            disabled={claimMutation.isPending || unclaimedMeow <= 0}
+                            className={`transition-all duration-300 ${
+                              unclaimedMeow > 0
+                                ? 'bg-crypto-green hover:bg-green-500 text-white'
+                                : 'bg-gray-600 text-gray-400'
+                            }`}
+                            size="sm"
+                          >
+                            <Zap className="w-4 h-4 mr-1" />
+                            Claim
+                          </Button>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Instructions */}
+                    <div className="absolute bottom-4 left-4 right-4 z-10">
+                      <Card className="crypto-gray border-crypto-pink/20 backdrop-blur-sm bg-opacity-90">
+                        <CardContent className="p-3">
+                          <div className="text-center">
+                            <p className="text-sm text-gray-300 mb-2">
+                              🎮 <strong>How to Play:</strong> Click on cats to upgrade them • Watch them work and earn $MEOW • Buy new cats from the shop
+                            </p>
+                            <div className="flex justify-center gap-2 text-xs text-gray-400">
+                              <span>🐱 = Working</span>
+                              <span>💰 = Earning</span>
+                              <span>✨ = Upgraded</span>
+                            </div>
+                          </div>
+                        </CardContent>
+                      </Card>
+                    </div>
+                  </CardContent>
+                </Card>
+              </div>
+            </TabsContent>
 
             {/* My Cats Tab */}
             <TabsContent value="cats">
@@ -446,6 +581,70 @@ export default function Farm() {
           </Tabs>
         </div>
       </div>
+
+      {/* Cat Information Dialog */}
+      <Dialog open={showCatDialog} onOpenChange={setShowCatDialog}>
+        <DialogContent className="crypto-gray border-crypto-pink/20 max-w-md">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2 text-xl">
+              <span className="text-2xl">
+                {selectedCat?.catId === 'basic' && '🐱'}
+                {selectedCat?.catId === 'farm' && '🐈'}
+                {selectedCat?.catId === 'business' && '🐱‍💼'}
+                {selectedCat?.catId === 'ninja' && '🥷'}
+                {selectedCat?.catId === 'cyber' && '🤖'}
+                {selectedCat?.catId === 'golden' && '✨'}
+              </span>
+              {selectedCat?.catId?.toUpperCase()} Cat
+            </DialogTitle>
+          </DialogHeader>
+
+          {selectedCat && (
+            <div className="space-y-4">
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <label className="text-sm text-gray-400">Level</label>
+                  <div className="text-lg font-semibold text-crypto-green">
+                    {selectedCat.level}
+                  </div>
+                </div>
+                <div>
+                  <label className="text-sm text-gray-400">Production</label>
+                  <div className="text-lg font-semibold text-crypto-green">
+                    {selectedCat.production?.toFixed(6)} $MEOW/h
+                  </div>
+                </div>
+              </div>
+
+              <div>
+                <label className="text-sm text-gray-400">Upgrade Cost</label>
+                <div className="text-lg font-semibold text-crypto-pink">
+                  {getUpgradeCost(selectedCat.level)} $MEOW
+                </div>
+              </div>
+
+              <Button
+                onClick={() => {
+                  upgradeCatMutation.mutate(selectedCat.id);
+                  setShowCatDialog(false);
+                }}
+                disabled={
+                  upgradeCatMutation.isPending ||
+                  parseFloat(user.meowBalance) < parseFloat(getUpgradeCost(selectedCat.level))
+                }
+                className="w-full gradient-pink hover:opacity-90"
+              >
+                <TrendingUp className="w-4 h-4 mr-2" />
+                Upgrade Cat ({getUpgradeCost(selectedCat.level)} $MEOW)
+              </Button>
+
+              <div className="text-xs text-gray-500 mt-2">
+                Click on cats in the farm to interact with them!
+              </div>
+            </div>
+          )}
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
