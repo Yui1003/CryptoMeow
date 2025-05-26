@@ -1,4 +1,4 @@
-import { mysqlTable, text, int, boolean, decimal, timestamp } from "drizzle-orm/mysql-core";
+import { mysqlTable, text, int, boolean, decimal, timestamp, bigint } from "drizzle-orm/mysql-core";
 import { createInsertSchema } from "drizzle-zod";
 import { z } from "zod";
 
@@ -42,7 +42,7 @@ export const gameHistory = mysqlTable("game_history", {
   meowWon: decimal("meow_won", { precision: 12, scale: 8 }).notNull().default("0.00000000"),
   serverSeed: text("server_seed").notNull(),
   clientSeed: text("client_seed").notNull(),
-  nonce: int("nonce").notNull(),
+  nonce: bigint("nonce", { mode: 'number' }).notNull(),
   result: text("result"), // JSON string of game result
   createdAt: timestamp("created_at").notNull().defaultNow(),
 });
