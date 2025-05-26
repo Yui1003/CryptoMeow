@@ -30,7 +30,7 @@ export class FarmScene extends Phaser.Scene {
       console.warn('Asset failed to load, using fallback:', file.key);
     });
 
-    // Load cat sprites based on correct mapping and actual file paths
+    // Load cat sprites based on actual file structure
     // House Cat = Classical
     this.load.image('basic_idle', 'assets/AllCats/Classical/IdleCat.png');
     this.load.image('basic_jump', 'assets/AllCats/Classical/JumpCat.png');
@@ -78,18 +78,36 @@ export class FarmScene extends Phaser.Scene {
     const catTypes = ['basic', 'farm', 'business', 'ninja', 'cyber', 'golden'];
     
     catTypes.forEach(type => {
-      // Create idle animation (alternating between idle and slight bounce)
-      this.anims.create({
-        key: `${type}_idle`,
-        frames: [
-          { key: `${type}_idle` },
-          { key: `${type}_idle` },
-          { key: `${type}_jump` },
-          { key: `${type}_idle` }
-        ],
-        frameRate: 2,
-        repeat: -1
-      });
+      // Only create animation if both textures exist
+      if (this.textures.exists(`${type}_idle`) && this.textures.exists(`${type}_jump`)) {
+        // Create idle animation (alternating between idle and slight bounce)
+        this.anims.create({
+          key: `${type}_idle`,
+          frames: [
+            { key: `${type}_idle` },
+            { key: `${type}_idle` },
+            { key: `${type}_idle` },
+            { key: `${type}_jump` },
+            { key: `${type}_idle` },
+            { key: `${type}_idle` }
+          ],
+          frameRate: 3,
+          repeat: -1
+        });
+        
+        // Create working animation (more active jumping)
+        this.anims.create({
+          key: `${type}_working`,
+          frames: [
+            { key: `${type}_jump` },
+            { key: `${type}_idle` },
+            { key: `${type}_jump` },
+            { key: `${type}_idle` }
+          ],
+          frameRate: 4,
+          repeat: -1
+        });
+      }
     });
   }
 
@@ -311,6 +329,12 @@ export class FarmScene extends Phaser.Scene {
   private startCatWorking(cat: CatSprite) {
     cat.isWorking = true;
     
+    // Switch to working animation if available
+    const workingAnimKey = `${cat.catData.catId}_working`;
+    if (this.anims.exists(workingAnimKey)) {
+      cat.play(workingAnimKey);
+    }
+    
     // Move cat to a work position
     const workX = Phaser.Math.Between(100, this.cameras.main.width - 100);
     const workY = Phaser.Math.Between(100, this.cameras.main.height - 100);
@@ -325,6 +349,11 @@ export class FarmScene extends Phaser.Scene {
         this.createCoinAnimation(cat);
         setTimeout(() => {
           cat.isWorking = false;
+          // Switch back to idle animation
+          const idleAnimKey = `${cat.catData.catId}_idle`;
+          if (this.anims.exists(idleAnimKey)) {
+            cat.play(idleAnimKey);
+          }
         }, 3000);
       }
     });
@@ -430,15 +459,19 @@ export class FarmScene extends Phaser.Scene {
     
     if (this.textures.exists(realTextureKey)) {
       cat = this.add.sprite(x, y, realTextureKey) as CatSprite;
+      cat.setScale(0.3); // Scale down real assets to appropriate size
       console.log(`Using real texture for ${catData.catId}`);
+      
+      // Start the idle animation for real textures
+      cat.play(`${catData.catId}_idle`);
     } else {
       cat = this.add.sprite(x, y, fallbackTextureKey) as CatSprite;
+      cat.setScale(0.8); // Larger scale for fallback graphics
       console.log(`Using fallback texture for ${catData.catId} - real texture ${realTextureKey} not found`);
     }
     
     cat.catData = catData;
     cat.setInteractive();
-    cat.setScale(0.8); // Larger scale for better visibility with real assets
     cat.setDepth(20); // Ensure cats appear above background
     
     // Create simple bed and bowls using graphics if assets don't load

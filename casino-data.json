@@ -14,7 +14,7 @@
       "username": "Roi",
       "password": "$2b$10$/ukW7Z.LfztKpiaPL5yMA.kn5mtodACfVHkgjINkcZYwnx7pyXa7m",
       "id": 4,
-      "balance": "1000.00",
+      "balance": "999.00",
       "meowBalance": "0.00000000",
       "isAdmin": false,
       "isBanned": false,
@@ -44,8 +44,8 @@
       "id": 1,
       "username": "admin",
       "password": "$2b$10$yiQUwI1/UJh4Y01jeDNBBOSO5rNsMOnsMpHRB7BCJhLY8El7J.oUi",
-      "balance": "2781.92",
-      "meowBalance": "0.56474801",
+      "balance": "2736.77",
+      "meowBalance": "4.27118125",
       "isAdmin": true,
       "isBanned": false,
       "createdAt": "2025-05-24T19:43:45.385Z"
@@ -152,6 +152,136 @@
     }
   ],
   "gameHistory": [
+    {
+      "gameType": "crash",
+      "betAmount": "1",
+      "winAmount": "1.1184904685127348",
+      "serverSeed": "mb4sweg8g59p5geekw0vyayora3l",
+      "clientSeed": "mb4sweg856fhkmq3k3y",
+      "nonce": 5,
+      "result": "{\"cashOutPoint\":1.1184904685127348,\"cashedOut\":true}",
+      "meowWon": "0.00000000",
+      "userId": 1,
+      "id": 203,
+      "createdAt": "2025-05-26T08:03:43.224Z"
+    },
+    {
+      "gameType": "crash",
+      "betAmount": "1",
+      "winAmount": "1.2181413030419652",
+      "serverSeed": "mb4sw9g5f2ah63nw3zn7zzi0tlvdoj",
+      "clientSeed": "mb4sw9g58nmkeej9308",
+      "nonce": 4,
+      "result": "{\"cashOutPoint\":1.2181413030419652,\"cashedOut\":true}",
+      "meowWon": "0.10814302",
+      "userId": 1,
+      "id": 202,
+      "createdAt": "2025-05-26T08:03:38.081Z"
+    },
+    {
+      "gameType": "crash",
+      "betAmount": "1",
+      "winAmount": "1.1714336053861079",
+      "serverSeed": "mb4sw1uk0ljar0osunea0pa5a4tphgjg",
+      "clientSeed": "mb4sw1uk01w3ys74gs7f",
+      "nonce": 3,
+      "result": "{\"cashOutPoint\":1.1714336053861079,\"cashedOut\":true}",
+      "meowWon": "0.00000000",
+      "userId": 1,
+      "id": 201,
+      "createdAt": "2025-05-26T08:03:27.639Z"
+    },
+    {
+      "gameType": "crash",
+      "betAmount": "1",
+      "winAmount": "0",
+      "serverSeed": "mb4svwngb4elylxuzlnzw43nic3c2",
+      "clientSeed": "mb4svwngmni5gj0whwi",
+      "nonce": 2,
+      "result": "{\"crashPoint\":1.1478316368443748,\"cashedOut\":false}",
+      "meowWon": "0.00000000",
+      "userId": 1,
+      "id": 200,
+      "createdAt": "2025-05-26T08:03:21.425Z"
+    },
+    {
+      "gameType": "crash",
+      "betAmount": "1",
+      "winAmount": "1.3437503303102782",
+      "serverSeed": "mb4svph5e7lxqwubybr7tyjulsoxeg",
+      "clientSeed": "mb4svph53s8ieap9h78",
+      "nonce": 1,
+      "result": "{\"cashOutPoint\":1.3437503303102782,\"cashedOut\":true}",
+      "meowWon": "0.00000000",
+      "userId": 1,
+      "id": 199,
+      "createdAt": "2025-05-26T08:03:13.703Z"
+    },
+    {
+      "gameType": "hilo",
+      "betAmount": "5",
+      "winAmount": "15",
+      "serverSeed": "mb4ssra736tfjls3hpsuy7fwpzokp",
+      "clientSeed": "mb4ssra7lmqx6l549jo",
+      "nonce": 100004,
+      "result": "{\"streak\":4,\"multiplier\":3,\"cashedOut\":true}",
+      "meowWon": "0.00000000",
+      "userId": 1,
+      "id": 198,
+      "createdAt": "2025-05-26T08:01:22.727Z"
+    },
+    {
+      "gameType": "slots",
+      "betAmount": "5",
+      "winAmount": "0",
+      "serverSeed": "mb4ssgmnrsqrulqbipowuuwamrbejd",
+      "clientSeed": "mb4ssgmnp57spdgzf9",
+      "nonce": 684078,
+      "result": "{\"symbolIndices\":[3,4,5],\"multiplier\":0,\"isWin\":false,\"winType\":\"No match\"}",
+      "meowWon": "0.00000000",
+      "userId": 1,
+      "id": 197,
+      "createdAt": "2025-05-26T08:00:40.298Z"
+    },
+    {
+      "gameType": "mines",
+      "betAmount": "50",
+      "winAmount": "0",
+      "serverSeed": "mb4ss0koxhbpdc2lltb9aehb4gd7m5",
+      "clientSeed": "mb4ss0ko3lezpopugq5",
+      "nonce": 18,
+      "result": "{\"tileId\":17,\"isMine\":true,\"revealedCount\":1}",
+      "meowWon": "0.00000000",
+      "userId": 1,
+      "id": 196,
+      "createdAt": "2025-05-26T08:00:22.961Z"
+    },
+    {
+      "gameType": "crash",
+      "betAmount": "1",
+      "winAmount": "0",
+      "serverSeed": "mb4rw3vmfu1nbtvqg18b8u5l3rdyo5",
+      "clientSeed": "mb4rw3vma5ifz10e74q",
+      "nonce": 2,
+      "result": "{\"crashPoint\":1.3891308565731972,\"cashedOut\":false}",
+      "meowWon": "0.11485744",
+      "userId": 1,
+      "id": 195,
+      "createdAt": "2025-05-26T07:35:33.276Z"
+    },
+    {
+      "gameType": "crash",
+      "betAmount": "1",
+      "winAmount": "1.0202765723123601",
+      "serverSeed": "mb4rvywpafvpqy67jkd6s8f0owd1l",
+      "clientSeed": "mb4rvywp4ojsg119r7l",
+      "nonce": 1,
+      "result": "{\"cashOutPoint\":1.0202765723123601,\"cashedOut\":true}",
+      "meowWon": "0.00000000",
+      "userId": 1,
+      "id": 194,
+      "createdAt": "2025-05-26T07:35:24.681Z"
+    },
     {
       "gameType": "slots",
       "betAmount": "1",
@@ -2662,43 +2792,30 @@
       "createdAt": "2025-05-24T19:44:29.073Z"
     },
     {
-      "gameType": "crash",
-      "betAmount": "1",
-      "winAmount": "1.0202765723123601",
-      "serverSeed": "mb4rvywpafvpqy67jkd6s8f0owd1l",
-      "clientSeed": "mb4rvywp4ojsg119r7l",
-      "nonce": 1,
-      "result": "{\"cashOutPoint\":1.0202765723123601,\"cashedOut\":true}",
-      "meowWon": "0.00000000",
-      "userId": 1,
-      "id": 194,
-      "createdAt": "2025-05-26T07:35:24.681Z"
-    },
-    {
-      "gameType": "crash",
+      "gameType": "mines",
       "betAmount": "1",
       "winAmount": "0",
-      "serverSeed": "mb4rw3vmfu1nbtvqg18b8u5l3rdyo5",
-      "clientSeed": "mb4rw3vma5ifz10e74q",
-      "nonce": 2,
-      "result": "{\"crashPoint\":1.3891308565731972,\"cashedOut\":false}",
-      "meowWon": "0.11485744",
-      "userId": 1,
-      "id": 195,
-      "createdAt": "2025-05-26T07:35:33.276Z"
+      "serverSeed": "mb4xzlkkcjn2rbnju8oohrscqu8bp",
+      "clientSeed": "mb4xzlkkd0zt9xkns1",
+      "nonce": 9,
+      "result": "{\"tileId\":8,\"isMine\":true,\"revealedCount\":0}",
+      "meowWon": "0.00000000",
+      "userId": 4,
+      "id": 204,
+      "createdAt": "2025-05-26T10:26:09.435Z"
     }
   ],
   "jackpot": {
     "id": 1,
     "amount": "0.10014286",
     "lastWinnerId": 1,
-    "lastWonAt": "2025-05-26T07:35:33.265Z",
-    "updatedAt": "2025-05-26T07:35:33.276Z"
+    "lastWonAt": "2025-05-26T08:03:38.066Z",
+    "updatedAt": "2025-05-26T10:26:09.435Z"
   },
   "currentUserId": 6,
   "currentDepositId": 6,
   "currentWithdrawalId": 8,
-  "currentGameHistoryId": 196,
+  "currentGameHistoryId": 205,
   "farmCats": [
     {
       "id": 1,
@@ -2706,7 +2823,7 @@
       "catId": "basic",
       "level": 8,
       "production": 0.003583180799999999,
-      "lastClaim": "2025-05-26T06:51:07.114Z",
+      "lastClaim": "2025-05-26T17:24:39.356Z",
       "createdAt": "2025-05-25T15:39:18.713Z"
     },
     {
@@ -2715,7 +2832,7 @@
       "catId": "golden",
       "level": 11,
       "production": 0.3095868211199999,
-      "lastClaim": "2025-05-26T06:51:07.114Z",
+      "lastClaim": "2025-05-26T17:24:39.356Z",
       "createdAt": "2025-05-25T15:39:40.311Z"
     },
     {
@@ -2724,16 +2841,16 @@
       "catId": "golden",
       "level": 12,
       "production": 0.37150418534399987,
-      "lastClaim": "2025-05-26T06:51:07.114Z",
+      "lastClaim": "2025-05-26T17:24:39.356Z",
       "createdAt": "2025-05-25T16:26:06.632Z"
     },
     {
       "id": 4,
       "userId": 1,
       "catId": "cyber",
-      "level": 3,
-      "production": 0.021599999999999998,
-      "lastClaim": "2025-05-26T06:51:07.114Z",
+      "level": 5,
+      "production": 0.031103999999999993,
+      "lastClaim": "2025-05-26T17:24:39.356Z",
       "createdAt": "2025-05-25T16:26:08.012Z"
     },
     {
@@ -2742,7 +2859,7 @@
       "catId": "ninja",
       "level": 3,
       "production": 0.011519999999999999,
-      "lastClaim": "2025-05-26T06:51:07.114Z",
+      "lastClaim": "2025-05-26T17:24:39.356Z",
       "createdAt": "2025-05-25T16:26:08.727Z"
     },
     {
@@ -2753,7 +2870,16 @@
       "production": 0.005,
       "lastClaim": "2025-05-25T20:53:04.895Z",
       "createdAt": "2025-05-25T20:53:04.895Z"
+    },
+    {
+      "id": 7,
+      "userId": 1,
+      "catId": "cyber",
+      "level": 2,
+      "production": 0.018,
+      "lastClaim": "2025-05-26T17:24:45.197Z",
+      "createdAt": "2025-05-26T17:24:45.197Z"
     }
   ],
-  "currentFarmCatId": 7
+  "currentFarmCatId": 8
 }
