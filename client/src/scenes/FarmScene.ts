@@ -491,13 +491,24 @@ export class FarmScene extends Phaser.Scene {
     const workX = Phaser.Math.Between(150, this.cameras.main.width - 150);
     const workY = Phaser.Math.Between(grassStartY + 50, this.cameras.main.height - 150);
 
+    // Determine direction and flip cat accordingly
+    const currentX = cat.x;
+    const isMovingLeft = workX < currentX;
+    
+    // Flip the cat sprite based on movement direction
+    if (isMovingLeft) {
+      cat.setFlipX(true); // Flip horizontally to face left
+    } else {
+      cat.setFlipX(false); // Face right (default)
+    }
+
     const nameText = (cat as any).nameText;
 
     this.tweens.add({
       targets: cat,
       x: workX,
       y: workY,
-      duration: 2000,
+      duration: 4000, // Increased from 2000 to 4000 for slower movement
       ease: 'Power2',
       onUpdate: () => {
         // Update name tag position to follow cat
